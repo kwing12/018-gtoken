@@ -264,12 +264,21 @@ function updBtn(){
 /* setTab: PURE DOM, zero scroll jump */
 function setTab(t){
   S.atab=t;S.atgt=[];S.aamt=0;S.atgtAmt={};var is=(t==='send');
+  var actorName=(S.ap===-1?'Quỹ chung':S.players[S.ap].name);
   var t0=$('t0');var t1=$('t1');
   if(t0){if(is)t0.classList.add('on');else t0.classList.remove('on')}
   if(t1){if(!is)t1.classList.add('on');else t1.classList.remove('on')}
   var lbl=$('tgtLbl');if(lbl)lbl.textContent=is?'GỬI CHO':'NHẬN TỪ';
   var ba=$('btnAll');if(ba){ba.textContent=is?'▶ Gửi cho TẤT CẢ':'◀ Nhận từ TẤT CẢ';ba.classList.remove('sel');ba.style.background='';ba.style.borderColor='';ba.style.color=''}
   var exb=$('btnExec');if(exb){exb.classList.remove('s','r');exb.classList.add(is?'s':'r')}
+  var rows=document.querySelectorAll('.tr');
+  for(var ri=0;ri<rows.length;ri++){
+    var idx=parseInt(rows[ri].getAttribute('data-idx'),10);
+    var tn=rows[ri].querySelector('.tn');
+    if(!tn)continue;
+    if(idx===-1)tn.textContent=actorName+' '+(is?'gửi':'nhận từ')+' Quỹ chung';
+    else tn.textContent=actorName+' '+(is?'gửi':'nhận từ')+' '+S.players[idx].name;
+  }
   var qbs=document.querySelectorAll('.qrb');
   for(var i=0;i<qbs.length&&i<4;i++){qbs[i].classList.remove('qs','qr');qbs[i].classList.add(is?'qs':'qr');qbs[i].textContent=(is?'\u2192':'\u2190')+fmt(S.quickDenoms[i])}
   var ci=$('camt');if(ci)ci.value='';
