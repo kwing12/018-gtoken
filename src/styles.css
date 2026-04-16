@@ -221,7 +221,8 @@ html.dark .ub button{color:#000}
 html.dark .btn-setup-primary{color:#000}
 .made-by{
   position:fixed;
-  right:10px;
+  left:50%;
+  transform:translateX(-50%);
   bottom:6px;
   z-index:2;
   font-size:10px;
