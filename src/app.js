@@ -120,7 +120,7 @@ function rSetup(){
   h+='<div class="slbl" style="margin-bottom:6px">Mức tiền nhanh (4 nút)</div>';
   h+='<div style="font-size:11px;color:var(--dim);margin-bottom:6px">Nên dùng: 1,000 - 2,000 - 5,000 - 10,000</div>';
   h+='<div class="qd-row">';
-  for(var qi=0;qi<4;qi++)h+='<input class="qdinp" value="'+S.quickDenoms[qi].toLocaleString('en-US')+'" oninput="upQD('+qi+',this)" type="text" inputmode="numeric" placeholder="đ">';
+  for(var qi=0;qi<4;qi++)h+='<input class="qdinp" value="'+S.quickDenoms[qi].toLocaleString('en-US')+'" oninput="upQDInput('+qi+',this)" onblur="upQDBlur('+qi+',this)" type="text" inputmode="numeric" placeholder="đ">';
   h+='</div>';
   h+='<div class="slbl" style="margin-bottom:6px">Ghi chú trận (tối đa 80 ký tự)</div>';
   h+='<input class="snm" value="'+esc(S.pinnedNote)+'" maxlength="80" oninput="S.pinnedNote=this.value" placeholder="Nhập ghi chú"></div>';
@@ -537,16 +537,25 @@ function copyResult(){
 function setPC(n){while(S.players.length<n)S.players.push({name:'Người chơi '+(S.players.length+1),color:COLS[S.players.length%COLS.length],emoji:'',balance:DBAL,initial:DBAL});while(S.players.length>n)S.players.pop();render()}
 function upName(i,v){S.players[i].name=v||('P'+(i+1))}
 function upBal(i,v){var n=parseFloat(v)*1000;if(isNaN(n)||n<=0)n=1000;n=Math.round(n/500)*500;S.players[i].initial=n;S.players[i].balance=n;var t=$('totLbl');if(t)t.textContent=ff(totInit())}
-function upQD(qi,el){
-  var raw=el?el.value:'';
-  var clean=String(raw).replace(/[^0-9]/g,'');
-  if(clean==='')return;
+function upQDInput(qi,el){
+  if(!el)return;
+  el.value=String(el.value).replace(/[^0-9]/g,'');
+}
+function upQDBlur(qi,el){
+  if(!el)return;
+  var clean=String(el.value).replace(/[^0-9]/g,'');
+  var prev=S.quickDenoms[qi];
   var n=parseInt(clean,10);
-  if(!isNaN(n)&&n>0){
-    n=Math.round(n/500)*500;
-    S.quickDenoms[qi]=n;
-    if(el)el.value=n.toLocaleString('en-US');
-  }
+  if(isNaN(n)||n<=0)n=prev;
+  n=Math.round(n/500)*500;
+  if(n<500)n=500;
+  S.quickDenoms[qi]=n;
+  el.value=n.toLocaleString('en-US');
+  saveState();
+}
+function flushQuickDenomInputs(){
+  var els=document.querySelectorAll('.qdinp');
+  for(var qi=0;qi<els.length&&qi<4;qi++)upQDBlur(qi,els[qi]);
 }
 function togglePot(v){S.potEnabled=v;if(!v)S.pot=0;render()}
 function upPot(v){var n=parseFloat(v)*1000;if(isNaN(n)||n<0)n=0;S.pot=Math.round(n/500)*500}
@@ -591,6 +600,7 @@ function appClr(c){if(pkFor>=0&&pkFor<S.players.length){S.players[pkFor].color=c
 function appEmoji(em){if(pkFor>=0&&pkFor<S.players.length){S.players[pkFor].emoji=em;pkFor=-1;var el=$('pkpnl');if(el)el.innerHTML='';render()}}
 
 function startG(){
+  flushQuickDenomInputs();
   var seen={};
   for(var i=0;i<S.players.length;i++){
     var n=S.players[i].name.trim();
