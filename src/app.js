@@ -41,6 +41,7 @@ if(!S){
 }
 if(!S)S={phase:'setup',players:mkPlayers(5),hist:[],sessions:[],quickDenoms:[1000,2000,5000,10000],modal:null,ap:null,atab:'send',aamt:0,atgt:[],undoStack:[],undoTimer:null,round:1,sortDesc:false,pot:0,potEnabled:false,timer:{startMs:0,elapsed:0,running:false},pinnedNote:'',theme:'auto',compact:false,autoTimerStart:false,showRanks:false,showTimerAlways:false,soundEnabled:true,vibrateEnabled:true,txTemplates:[],histFilter:-1,hidePinned:false};
 applyTheme();
+try{window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){if(S.theme==='auto')applyTheme()})}catch(e){try{window.matchMedia('(prefers-color-scheme: dark)').addListener(function(){if(S.theme==='auto')applyTheme()})}catch(e2){}}
 
 /* ===== UTILS ===== */
 function fmt(n){var a=n<0?-n:n;if(a>=1000000)return(n/1000000).toFixed(a%1000000===0?0:1)+'M';if(a>=1000)return(n/1000).toFixed(a%1000===0?0:1)+'k';return''+n}
@@ -63,14 +64,25 @@ function startTimer(){S.timer.startMs=Date.now();S.timer.running=true}
 function pauseTimer(){if(S.timer.running){S.timer.elapsed+=Date.now()-S.timer.startMs;S.timer.running=false;S.timer.startMs=0}}
 function resumeTimer(){S.timer.startMs=Date.now();S.timer.running=true}
 function resetTimer(){S.timer={startMs:0,elapsed:0,running:false}}
-function toggleTimer(){if(S.timer.running)pauseTimer();else resumeTimer();saveState();render()}
+function toggleTimer(){
+  if(S.timer.running)pauseTimer();else resumeTimer();
+  saveState();
+  var btn=$('timerElBtn');
+  if(btn){btn.className='timer-btn '+(S.timer.running?'run':'pause');btn.innerHTML=(S.timer.running?'⏸ ':'▶ ')+'<span id="timerEl">'+fmtTime(getElapsed())+'</span>'}
+}
 function startTimerTick(){if(timerInterval)clearInterval(timerInterval);timerInterval=setInterval(function(){if(S.phase==='playing'&&S.timer.running)updateTimerDisplay()},1000)}
 function updateTimerDisplay(){var el=$('timerEl');if(el)el.textContent=fmtTime(getElapsed())}
 function pushToast(msg){clearTimeout(toastTimer);var wr=$('toast-root');if(!wr)return;wr.innerHTML='<div class="toast">'+esc(msg)+'</div>';toastTimer=setTimeout(function(){if(wr)wr.innerHTML=''},3000)}
 function applyTheme(){var dark=false;if(S.theme==='dark')dark=true;else if(S.theme==='auto'){try{dark=window.matchMedia('(prefers-color-scheme: dark)').matches}catch(e){dark=false}}if(dark)document.documentElement.classList.add('dark');else document.documentElement.classList.remove('dark')}
 
 /* ===== SAVE ===== */
-function saveState(){try{pauseTimer();var o={phase:S.phase,players:S.players,hist:S.hist,sessions:S.sessions,quickDenoms:S.quickDenoms,undoStack:S.undoStack,round:S.round,sortDesc:S.sortDesc,pot:S.pot,potEnabled:S.potEnabled,timer:S.timer,pinnedNote:S.pinnedNote,theme:S.theme,compact:S.compact,autoTimerStart:S.autoTimerStart,showRanks:S.showRanks,showTimerAlways:S.showTimerAlways,soundEnabled:S.soundEnabled,vibrateEnabled:S.vibrateEnabled,txTemplates:S.txTemplates,histFilter:S.histFilter,hidePinned:S.hidePinned};localStorage.setItem('wc_v13',JSON.stringify(o))}catch(e){}}
+function saveState(){
+  try{
+    var savedTimer={startMs:S.timer.startMs,elapsed:S.timer.elapsed,running:S.timer.running};
+    var o={phase:S.phase,players:S.players,hist:S.hist,sessions:S.sessions,quickDenoms:S.quickDenoms,undoStack:S.undoStack,round:S.round,sortDesc:S.sortDesc,pot:S.pot,potEnabled:S.potEnabled,timer:savedTimer,pinnedNote:S.pinnedNote,theme:S.theme,compact:S.compact,autoTimerStart:S.autoTimerStart,showRanks:S.showRanks,showTimerAlways:S.showTimerAlways,soundEnabled:S.soundEnabled,vibrateEnabled:S.vibrateEnabled,txTemplates:S.txTemplates,histFilter:S.histFilter,hidePinned:S.hidePinned};
+    localStorage.setItem('wc_v13',JSON.stringify(o))
+  }catch(e){}
+}
 
 /* ===== RENDER ===== */
 function render(){var a=$('app');if(S.phase==='setup')a.innerHTML=rSetup();else a.innerHTML=rPlay();saveState()}
@@ -89,7 +101,7 @@ function rSetup(){
   h+='<div class="slbl" style="margin-bottom:8px">Số người chơi (2-20)</div>';
   h+='<div class="pc-ctl"><button class="pc-step" onmousedown="pcPressStart(-1)" onmouseup="pcPressEnd()" onmouseleave="pcPressEnd()" ontouchstart="pcPressStart(-1)" ontouchend="pcPressEnd()">-</button><div class="pc-num">'+S.players.length+'</div><button class="pc-step" onmousedown="pcPressStart(1)" onmouseup="pcPressEnd()" onmouseleave="pcPressEnd()" ontouchstart="pcPressStart(1)" ontouchend="pcPressEnd()">+</button></div>';
   h+='<button class="btn-ghost" onclick="resetDefaults()">Đặt tất cả về mặc định</button>';
-  h+='<button class="btn-ghost" onclick="splitTotal()">Chia đều từ tổng</button>';
+  h+='<div style="display:flex;gap:5px"><input id="splitInp" class="sbal" style="flex:1;width:auto;text-align:left" type="number" placeholder="Tổng (k)" step="1" min="1"><span class="sdim">k =</span><button class="btn-ghost" style="margin:0;flex-shrink:0;width:auto;padding:8px 10px" onclick="splitTotal()">Chia đều</button></div>';
   h+='<div class="slbl" style="margin-bottom:8px;margin-top:10px">Người chơi</div>';
   h+='<div style="'+(S.players.length>8?'max-height:320px;overflow-y:auto;':'')+'">';
   for(var i=0;i<S.players.length;i++){var p=S.players[i];
@@ -120,20 +132,23 @@ function rSetup(){
 /* ===== PLAY ===== */
 function rPlay(){
   var tot=totBal()+S.pot,ti=totInit()+S.pot,ok=(tot===ti),undoCnt=S.undoStack.length,mode=cardMode();
+  var showTimer=(S.showTimerAlways||S.timer.running||getElapsed()>0);
+  var isMobile=(window.innerWidth<640);
   var h='<div class="hd"><div class="hd-l"><h1>VÍ TRUNG TÂM</h1>';
   h+='<div class="rnd" onclick="incRound()">Vòng <b>'+S.round+'</b></div></div>';
+  if(showTimer&&isMobile)h+='<button id="timerElBtn" class="timer-btn '+(S.timer.running?'run':'pause')+'" onclick="toggleTimer()">'+(S.timer.running?'⏸ ':'▶ ')+'<span id="timerEl">'+fmtTime(getElapsed())+'</span></button>';
   h+='<div class="hd-r">';
   h+='<button class="ib'+(undoCnt>0?' hot':'')+'" onclick="showUndoHist()" title="Hoàn tác">↺'+(undoCnt>0?' '+undoCnt:'')+'</button>';
   h+='<button class="ib'+(S.sortDesc?' hot':'')+'" onclick="toggleSort()" title="Sắp xếp">⇅</button>';
   h+='<button class="ib'+(S.compact?' hot':'')+'" onclick="toggleCompact()" title="Chế độ gọn">'+(S.compact?'≡':'⊞')+'</button>';
   h+='<button class="ib" onclick="showSettings()" title="Cài đặt">⚙</button>';
-  h+='<button class="ib" onclick="showUndoHist()" title="Lịch sử">📋</button>';
+  h+='<button class="ib" onclick="showSess()" title="Lịch sử trận">📋</button>';
   h+='<button class="ib" onclick="showReset()" title="Đặt lại">⊙</button>';
   h+='</div></div>';
   if(S.pinnedNote&&!S.hidePinned)h+='<div class="note"><span>'+esc(S.pinnedNote)+'</span><button class="mc" style="width:22px;height:22px" onclick="S.hidePinned=true;render()">×</button></div>';
   h+='<div class="ckb"><span>'+S.hist.length+' GD &bull; Tổng: <b style="color:var(--tx)">'+ff(tot)+'</b></span>';
   h+='<span class="'+(ok?'ok':'er')+'">'+(ok?'&#10003; Hợp lệ':'&#10007; LỆCH')+'</span></div>';
-  if(S.showTimerAlways||S.timer.running||getElapsed()>0){h+='<div style="padding:7px 13px;border-bottom:1px solid var(--bd);display:flex;justify-content:flex-end"><button id="timerElBtn" class="timer-btn '+(S.timer.running?'run':'pause')+'" onclick="toggleTimer()">'+(S.timer.running?'⏸ ':'▶ ')+'<span id="timerEl">'+fmtTime(getElapsed())+'</span></button></div>'}
+  if(showTimer&&!isMobile){h+='<div style="padding:7px 13px;border-bottom:1px solid var(--bd);display:flex;justify-content:flex-end"><button id="timerElBtn" class="timer-btn '+(S.timer.running?'run':'pause')+'" onclick="toggleTimer()">'+(S.timer.running?'⏸ ':'▶ ')+'<span id="timerEl">'+fmtTime(getElapsed())+'</span></button></div>'}
   h+='<div class="pls">';
   if(S.potEnabled){h+='<div class="pc compact" onclick="openPotAct()"><div class="stripe" style="background:var(--gld)"></div><div class="pc-body"><div class="av" style="background:var(--gld)">💰</div><div class="inf"><div class="nm">Quỹ chung</div><div class="bal">'+ff(S.pot)+'</div></div></div><div class="pc-r"><div class="dl dz">Quỹ</div></div></div>'}
   var idxs=[];for(var k=0;k<S.players.length;k++)idxs.push(k);
@@ -200,7 +215,28 @@ function updTgt(){
   var rows=document.querySelectorAll('.tr');
   for(var i=0;i<rows.length;i++){var idx=parseInt(rows[i].getAttribute('data-idx'),10);if(S.atgt.indexOf(idx)>=0)rows[i].classList.add('sel');else rows[i].classList.remove('sel')}
   var others=[];for(var i=0;i<S.players.length;i++){if(i!==S.ap)others.push(i)}if(S.potEnabled&&S.ap!==-1)others.push(-1);
-  var ba=$('btnAll');if(ba){if(S.atgt.length===others.length&&others.length>0)ba.classList.add('sel');else ba.classList.remove('sel')}
+  var ba=$('btnAll');
+  if(ba){
+    if(S.atgt.length===others.length&&others.length>0){
+      ba.classList.add('sel');
+      ba.style.background='';
+      ba.style.borderColor='';
+      ba.style.color='';
+      ba.textContent='✓ Đã chọn TẤT CẢ — Bỏ chọn';
+    }else if(S.atgt.length>0){
+      ba.classList.remove('sel');
+      ba.style.background='rgba(201,134,12,.06)';
+      ba.style.borderColor='rgba(201,134,12,.5)';
+      ba.style.color='var(--gld)';
+      ba.textContent=(S.atab==='send'?'▶ Gửi cho ':'◀ Nhận từ ')+S.atgt.length+' người';
+    }else{
+      ba.classList.remove('sel');
+      ba.style.background='';
+      ba.style.borderColor='';
+      ba.style.color='';
+      ba.textContent=(S.atab==='send'?'▶ Gửi cho TẤT CẢ':'◀ Nhận từ TẤT CẢ');
+    }
+  }
   updBtn()}
 function updBtn(){
   var btn=$('btnExec');if(!btn)return;
@@ -217,25 +253,45 @@ function setTab(t){
   if(t0){if(is)t0.classList.add('on');else t0.classList.remove('on')}
   if(t1){if(!is)t1.classList.add('on');else t1.classList.remove('on')}
   var lbl=$('tgtLbl');if(lbl)lbl.textContent=is?'GỬI CHO':'NHẬN TỪ';
-  var ba=$('btnAll');if(ba){ba.textContent=is?'▶ Gửi cho TẤT CẢ':'◀ Nhận từ TẤT CẢ';ba.classList.remove('sel')}
+  var ba=$('btnAll');if(ba){ba.textContent=is?'▶ Gửi cho TẤT CẢ':'◀ Nhận từ TẤT CẢ';ba.classList.remove('sel');ba.style.background='';ba.style.borderColor='';ba.style.color=''}
   var exb=$('btnExec');if(exb){exb.classList.remove('s','r');exb.classList.add(is?'s':'r')}
   var qbs=document.querySelectorAll('.qrb');
-  for(var i=0;i<qbs.length;i++){qbs[i].classList.remove('qs','qr');qbs[i].classList.add(is?'qs':'qr');qbs[i].textContent=(is?'\u2192':'\u2190')+fmt(S.quickDenoms[i])}
+  for(var i=0;i<qbs.length&&i<4;i++){qbs[i].classList.remove('qs','qr');qbs[i].classList.add(is?'qs':'qr');qbs[i].textContent=(is?'\u2192':'\u2190')+fmt(S.quickDenoms[i])}
   var ci=$('camt');if(ci)ci.value='';
   updAmt();updTgt()}
 
 function setAmt(a){S.aamt=a;var ci=$('camt');if(ci)ci.value='';updAmt()}
 function setCamt(v){var n=parseFloat(v)*1000;S.aamt=(!isNaN(n)&&n>0)?n:0;var btns=document.querySelectorAll('.ab');for(var i=0;i<btns.length;i++)btns[i].classList.remove('sel');updBtn()}
 function togTgt(idx){var i=S.atgt.indexOf(idx);if(i>=0)S.atgt.splice(i,1);else S.atgt.push(idx);updTgt()}
-function togAll(){var others=[];for(var i=0;i<S.players.length;i++){if(i!==S.ap)others.push(i)}if(S.potEnabled&&S.ap!==-1)others.push(-1);if(S.atgt.length===others.length){S.atgt=[]}else{S.atgt=[];for(var i=0;i<others.length;i++)S.atgt.push(others[i])}updTgt();var ba=$('btnAll');if(ba){if(S.atgt.length===others.length)ba.textContent='✓ Đã chọn TẤT CẢ - Bỏ chọn';else ba.textContent=(S.atab==='send'?'▶ Gửi cho TẤT CẢ':'◀ Nhận từ TẤT CẢ')}}
+function togAll(){var others=[];for(var i=0;i<S.players.length;i++){if(i!==S.ap)others.push(i)}if(S.potEnabled&&S.ap!==-1)others.push(-1);if(S.atgt.length===others.length){S.atgt=[]}else{S.atgt=[];for(var i=0;i<others.length;i++)S.atgt.push(others[i])}updTgt()}
 function quickAllByIdx(qi){
   S.aamt=S.quickDenoms[qi];
   var others=[];for(var i=0;i<S.players.length;i++){if(i!==S.ap)others.push(i)}if(S.potEnabled&&S.ap!==-1)others.push(-1);
   S.atgt=[];for(var i=0;i<others.length;i++)S.atgt.push(others[i]);
   var ci=$('camt');if(ci)ci.value='';updAmt();updTgt()}
-function openCustomAmt(){var v=prompt('Nhập số tiền (nghìn đồng):','5');if(v===null)return;setCamt(v)}
+function openCustomAmt(){var ci=$('camt');if(ci){ci.focus();ci.select()}}
 function showErr(msg){var el=$('errMsg');if(!el)return;el.innerHTML='<span>'+esc(msg)+'</span><button style="float:right;border:none;background:transparent;color:var(--red);cursor:pointer" onclick="this.parentNode.style.display=\'none\'">×</button>';el.style.display='block';clearTimeout(el._t);el._t=setTimeout(function(){if(el)el.style.display='none'},4000)}
-function saveTpl(){if(S.aamt<=0||S.atgt.length===0){showErr('Cần chọn số tiền và người nhận');return}var n=prompt('Tên mẫu giao dịch:','Mẫu '+(S.txTemplates.length+1));if(!n)return;var t={name:n,tab:S.atab,amt:S.aamt,selectAll:(S.atgt.length===S.players.length-1)};if(S.txTemplates.length>=5)S.txTemplates.shift();S.txTemplates.push(t);saveState();render();openAct(S.ap);S.aamt=t.amt;updAmt()}
+function saveTpl(){
+  if(S.aamt<=0||S.atgt.length===0){showErr('Cần chọn số tiền và người nhận');return}
+  var saveBtn=document.querySelector('[onclick="saveTpl()"]');
+  if(!saveBtn)return;
+  var defaultName='Mẫu '+(S.txTemplates.length+1);
+  saveBtn.outerHTML='<div id="tplNameRow" style="display:flex;gap:5px;margin-bottom:6px"><input id="tplNameInp" class="snm" style="flex:1" placeholder="Tên mẫu" value="'+esc(defaultName)+'"><button onclick="confirmSaveTpl()" style="padding:6px 10px;border-radius:7px;background:var(--gld);border:none;color:#fff;font-weight:700;cursor:pointer;font-size:12px">Lưu</button><button onclick="cancelSaveTpl()" style="padding:6px 10px;border-radius:7px;background:var(--sf2);border:1px solid var(--bd);color:var(--dim);cursor:pointer;font-size:12px">Hủy</button></div>';
+  var inp=$('tplNameInp');
+  if(inp){inp.focus();inp.select()}
+}
+function confirmSaveTpl(){
+  var inp=$('tplNameInp');
+  var n=inp?inp.value.trim():'';
+  if(!n)n='Mẫu '+(S.txTemplates.length+1);
+  var t={name:n,tab:S.atab,amt:S.aamt,selectAll:(S.atgt.length===S.players.length-1)};
+  if(S.txTemplates.length>=5)S.txTemplates.shift();
+  S.txTemplates.push(t);
+  saveState();
+  var row=$('tplNameRow');
+  if(row)row.outerHTML='<button class="btn-ghost" onclick="saveTpl()">★ Lưu mẫu</button>';
+}
+function cancelSaveTpl(){var row=$('tplNameRow');if(row)row.outerHTML='<button class="btn-ghost" onclick="saveTpl()">★ Lưu mẫu</button>'}
 function applyTpl(i){var t=S.txTemplates[i];if(!t)return;setTab(t.tab);S.aamt=t.amt;if(t.selectAll)togAll();updAmt()}
 
 /* ===== EXECUTE ===== */
@@ -260,7 +316,11 @@ function execAct(){
   S.undoStack.push({snap:snap,snapPot:snapPot,idx:S.hist.length-1});
   if(S.undoStack.length>20)S.undoStack.shift();
   for(var bi=0;bi<S.players.length;bi++){if(S.players[bi].balance===0)pushToast('💥 '+S.players[bi].name+' vừa hết tiền!')}
-  var rk=rankAt(S.sortDesc?0:0);if(rk===1&&S.players.length>1)pushToast('🏆 '+S.players[0].name+' đang dẫn đầu!');
+  var leader=-1;var leaderBal=-1;
+  for(var bi=0;bi<S.players.length;bi++){if(S.players[bi].balance>leaderBal){leaderBal=S.players[bi].balance;leader=bi}}
+  var prevLeader=-1;var prevLeaderBal=-1;
+  for(var bj=0;bj<snap.length;bj++){if(snap[bj]>prevLeaderBal){prevLeaderBal=snap[bj];prevLeader=bj}}
+  if(leader!==prevLeader&&leader>=0)pushToast('🏆 '+S.players[leader].name+' đang dẫn đầu!');
   vib(25);coin(is?'s':'r');showUndoBar();clMoF();render()}
 
 /* ===== UNDO ===== */
@@ -284,8 +344,8 @@ function calcStats(){
   var s=[];for(var i=0;i<S.players.length;i++)s.push({out:0,inp:0,cnt:0});
   for(var h=0;h<S.hist.length;h++){
     var e=S.hist[h];if(!e.t)continue;
-    if(e.tp==='s'){s[e.f].out+=e.a*e.t.length;s[e.f].cnt++;for(var j=0;j<e.t.length;j++)s[e.t[j]].inp+=e.a}
-    else if(e.tp==='r'){s[e.f].inp+=e.a*e.t.length;s[e.f].cnt++;for(var j=0;j<e.t.length;j++)s[e.t[j]].out+=e.a}}
+    if(e.tp==='s'){if(e.f>=0){s[e.f].out+=e.a*e.t.length;s[e.f].cnt++}for(var j=0;j<e.t.length;j++)if(e.t[j]>=0)s[e.t[j]].inp+=e.a}
+    else if(e.tp==='r'){if(e.f>=0){s[e.f].inp+=e.a*e.t.length;s[e.f].cnt++}for(var j=0;j<e.t.length;j++)if(e.t[j]>=0)s[e.t[j]].out+=e.a}}
   return s}
 function calcDebts(){
   var balances=[];for(var i=0;i<S.players.length;i++){var net=S.players[i].balance-S.players[i].initial;if(Math.abs(net)>0)balances.push({idx:i,net:net})}
@@ -321,10 +381,12 @@ function renderUhModal(){
   h+='<div style="flex:1;padding:10px;background:var(--bg);border-radius:10px;text-align:center"><div style="font-family:monospace;font-size:16px;font-weight:800;color:var(--gld)">'+S.hist.length+'</div><div style="font-size:10px;color:var(--dim);margin-top:2px">Giao dịch</div></div>';
   h+='<div style="flex:1;padding:10px;background:var(--bg);border-radius:10px;text-align:center"><div style="font-family:monospace;font-size:16px;font-weight:800;color:var(--grn)">'+S.round+'</div><div style="font-size:10px;color:var(--dim);margin-top:2px">Vòng</div></div>';
   h+='<div style="flex:1;padding:10px;background:var(--bg);border-radius:10px;text-align:center"><div style="font-family:monospace;font-size:16px;font-weight:800;color:var(--tx)">'+S.players.length+'</div><div style="font-size:10px;color:var(--dim);margin-top:2px">Người chơi</div></div>';
+  var flowVol=0;for(var fv=0;fv<S.hist.length;fv++){if(S.hist[fv].t)flowVol+=S.hist[fv].a*S.hist[fv].t.length}
+  h+='<div style="flex:1;padding:10px;background:var(--bg);border-radius:10px;text-align:center"><div style="font-family:monospace;font-size:16px;font-weight:800;color:var(--pur)">'+fmt(flowVol)+'</div><div style="font-size:10px;color:var(--dim);margin-top:2px">Tiền lưu thông</div></div>';
   h+='</div>';
-  h+='<div class="stat-hd"><div style="width:32px;flex-shrink:0"></div><div style="flex:1"></div><div class="stat-col" style="color:var(--red)">Đã trả</div><div class="stat-col" style="color:var(--grn)">Đã nhận</div><div class="stat-col">Chênh lệch</div></div>';
+  h+='<div class="stat-hd"><div style="width:32px;flex-shrink:0"></div><div style="flex:1"></div><div class="stat-col" style="color:var(--red);cursor:pointer" onclick="setSortStats(\'out\')">Đã trả'+(statsSort==='out'?' ↓':'')+'</div><div class="stat-col" style="color:var(--grn);cursor:pointer" onclick="setSortStats(\'inp\')">Đã nhận'+(statsSort==='inp'?' ↓':'')+'</div><div class="stat-col" style="cursor:pointer" onclick="setSortStats(\'delta\')">Chênh lệch'+(statsSort==='delta'?' ↓':'')+'</div></div>';
   var sorted=[];for(var i=0;i<S.players.length;i++)sorted.push(i);
-  sorted.sort(function(a,b){if(statsSort==='name')return S.players[a].name.localeCompare(S.players[b].name);if(statsSort==='count')return stats[b].cnt-stats[a].cnt;return (S.players[b].balance-S.players[b].initial)-(S.players[a].balance-S.players[a].initial)});
+  sorted.sort(function(a,b){if(statsSort==='name')return S.players[a].name.localeCompare(S.players[b].name);if(statsSort==='count')return stats[b].cnt-stats[a].cnt;if(statsSort==='out')return stats[b].out-stats[a].out;if(statsSort==='inp')return stats[b].inp-stats[a].inp;return (S.players[b].balance-S.players[b].initial)-(S.players[a].balance-S.players[a].initial)});
   for(var si=0;si<sorted.length;si++){var i=sorted[si];var p=S.players[i];var st=stats[i];var nd=p.balance-p.initial;var dc2=nd>0?'var(--grn)':nd<0?'var(--red)':'var(--dim)';
     h+='<div class="stat-r">'+avHtml(p,'stat-av',16)+'<span class="stat-nm">'+esc(p.name)+'</span>';
     h+='<div class="stat-col" style="color:var(--red)">'+fmt(st.out)+'</div>';
@@ -336,17 +398,19 @@ function renderUhModal(){
   var debts=calcDebts();
   h+='<div class="slbl">Thanh toán cuối trận</div>';
   if(debts.length===0)h+='<div class="hi">Không có khoản nợ cần thanh toán</div>';
-  else{for(var di2=0;di2<debts.length;di2++){var dtx=debts[di2];h+='<div class="hi">'+esc(S.players[dtx.from].name)+' tra '+esc(S.players[dtx.to].name)+' '+ff(dtx.amount)+'</div>'}}
+  else{for(var di2=0;di2<debts.length;di2++){var dtx=debts[di2];h+='<div class="hi" style="display:flex;align-items:center;gap:7px">'+avHtml(S.players[dtx.from],'av2',14)+'<span>'+esc(S.players[dtx.from].name)+'</span><span style="opacity:.6">→</span>'+avHtml(S.players[dtx.to],'av2',14)+'<span>'+esc(S.players[dtx.to].name)+':</span><b style="margin-left:auto">'+ff(dtx.amount)+'</b></div>'}}
   h+='<button class="btn-ghost" onclick="copyResult()">Sao chép để chia sẻ</button></div>';
   h+='</div></div>';
   $('modal-root').innerHTML=h;S.modal='__uh__'}
 function doUndoH(){doUndo();if($('modal-root').innerHTML)renderUhModal()}
+function setSortStats(col){statsSort=col;renderUhModal()}
 
 /* ===== RESET MODAL ===== */
 function showReset(){
   var h='<div class="mo" onclick="clMo(event)"><div class="md" onclick="event.stopPropagation()">';
   h+='<div class="mh"><h2>&#9111; Tùy chọn đặt lại</h2><button class="mc" onclick="clMoF()">&#10005;</button></div>';
   h+='<button class="ropt" onclick="resetBal()"><span class="ico">&#9654;&#9654;</span><div><div>Đặt lại số dư &mdash; tiếp tục chơi</div><div class="rdesc">Giữ tên và cấu hình. Đặt lại tiền về ban đầu. Lưu kết quả vào lịch sử. Vòng reset về 1.</div></div></button>';
+  h+='<button class="ropt" onclick="resetTimerOnly()"><span class="ico">⏱</span><div><div>Chỉ reset vòng và đồng hồ</div><div class="rdesc">Giữ nguyên số dư. Reset vòng về 1 và đồng hồ về 0. KHÔNG lưu lịch sử.</div></div></button>';
   h+='<button class="ropt" onclick="resetNew()"><span class="ico">&#128260;</span><div><div>Trận đấu mới</div><div class="rdesc">Lưu kết quả trận này, quay về màn hình thiết lập.</div></div></button>';
   h+='<button class="ropt dng" onclick="resetHard()"><span class="ico">&#128465;</span><div><div>Xóa toàn bộ dữ liệu</div><div class="rdesc">Xóa lịch sử, xóa tiến trình. Không thể hoàn tác.</div></div></button>';
   h+='</div></div>';$('modal-root').innerHTML=h;S.modal='__rst__'}
@@ -355,21 +419,35 @@ function saveSess(){
   if(S.hist.length===0)return;
   var res=[];for(var i=0;i<S.players.length;i++){var p=S.players[i];res.push({name:p.name,color:p.color,emoji:p.emoji||'',balance:p.balance,initial:p.initial})}
   S.sessions.push({date:new Date().toLocaleString('vi-VN'),results:res,txCount:S.hist.length,rounds:S.round})}
+function confirmModal(msg,onYes){
+  var mr=$('modal-root');
+  mr.innerHTML='<div class="mo" style="z-index:110" onclick="closeConfirm()"><div class="md" style="max-height:auto" onclick="event.stopPropagation()"><div style="font-size:14px;font-weight:600;margin-bottom:16px;line-height:1.5">'+esc(msg)+'</div><div style="display:flex;gap:8px"><button onclick="closeConfirm()" style="flex:1;padding:11px;border-radius:10px;background:var(--sf2);border:1px solid var(--bd);font-size:13px;font-weight:700;cursor:pointer">Hủy</button><button id="confirmYes" style="flex:1;padding:11px;border-radius:10px;background:var(--red);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Xác nhận</button></div></div></div>';
+  $('confirmYes').onclick=function(){closeConfirm();onYes()}
+}
+function closeConfirm(){$('modal-root').innerHTML=''}
+function resetTimerOnly(){S.round=1;resetTimer();if(timerInterval){clearInterval(timerInterval);timerInterval=null}if(S.autoTimerStart){startTimer();startTimerTick()}clMoF();render()}
 
 function resetBal(){
-  if(!confirm('Đặt lại số dư về ban đầu? Kết quả sẽ lưu vào lịch sử.'))return;
-  saveSess();for(var i=0;i<S.players.length;i++)S.players[i].balance=S.players[i].initial;
-  S.hist=[];S.undoStack=[];S.round=1;$('undo-root').innerHTML='';clMoF();render()}
+  confirmModal('Đặt lại số dư về ban đầu? Kết quả sẽ lưu vào lịch sử.',function(){
+    saveSess();for(var i=0;i<S.players.length;i++)S.players[i].balance=S.players[i].initial;
+    S.hist=[];S.undoStack=[];S.round=1;resetTimer();if(S.autoTimerStart){startTimer();startTimerTick()}
+    $('undo-root').innerHTML='';clMoF();render()
+  })}
 function resetNew(){
-  if(!confirm('Kết thúc trận đấu? Kết quả sẽ lưu vào lịch sử.'))return;
-  saveSess();S.phase='setup';S.hist=[];S.undoStack=[];S.round=1;
-  for(var i=0;i<S.players.length;i++)S.players[i].balance=S.players[i].initial;
-  $('undo-root').innerHTML='';clMoF();render()}
+  confirmModal('Kết thúc trận đấu? Kết quả sẽ lưu vào lịch sử.',function(){
+    saveSess();S.phase='setup';S.hist=[];S.undoStack=[];S.round=1;
+    for(var i=0;i<S.players.length;i++)S.players[i].balance=S.players[i].initial;
+    resetTimer();
+    if(timerInterval){clearInterval(timerInterval);timerInterval=null}
+    $('undo-root').innerHTML='';clMoF();render()
+  })}
 function resetHard(){
-  if(!confirm('XÓA TOÀN BỘ? Không thể hoàn tác!'))return;
-  S.sessions=[];S.phase='setup';S.hist=[];S.undoStack=[];S.round=1;
-  S.players=mkPlayers(5);$('undo-root').innerHTML='';clMoF();
-  try{localStorage.removeItem('wc_v13');localStorage.removeItem('wc_v12')}catch(e){}render()}
+  confirmModal('XÓA TOÀN BỘ dữ liệu? Không thể hoàn tác!',function(){
+    S.sessions=[];S.phase='setup';S.hist=[];S.undoStack=[];S.round=1;
+    S.players=mkPlayers(5);$('undo-root').innerHTML='';clMoF();
+    try{localStorage.removeItem('wc_v13');localStorage.removeItem('wc_v12')}catch(e){}
+    render()
+  })}
 
 /* ===== SESSIONS MODAL ===== */
 function showSess(){
@@ -377,13 +455,13 @@ function showSess(){
   h+='<div class="mh"><h2>&#128203; Lịch sử trận đấu</h2><button class="mc" onclick="clMoF()">&#10005;</button></div>';
   if(S.sessions.length===0)h+='<p style="color:var(--dim);text-align:center;padding:24px;font-size:13px">Chưa có trận đấu nào</p>';
   else{for(var si=S.sessions.length-1;si>=0;si--){var ss=S.sessions[si];
-    h+='<div class="ss"><div class="sd">'+esc(ss.date)+' &bull; '+ss.txCount+' GD'+(ss.rounds?' &bull; '+ss.rounds+' vong':'')+'</div><div class="sr">';
+    h+='<div class="ss"><div class="sd">'+esc(ss.date)+' &bull; '+ss.txCount+' GD'+(ss.rounds?' &bull; '+ss.rounds+' vòng':'')+'</div><div class="sr">';
     for(var ri=0;ri<ss.results.length;ri++){var r=ss.results[ri];var rd=r.balance-r.initial;var rc=rd>0?'dp':rd<0?'dn':'dz';
       h+='<span class="sc2 '+rc+'" style="border-left:2px solid '+r.color+'">'+esc(r.name)+': '+(rd>0?'+':'')+fmt(rd)+'</span>'}
     h+='</div></div>'}
     h+='<button onclick="clrSess()" class="btn-ghost dng">Xóa tất cả lịch sử</button>'}
   h+='</div></div>';$('modal-root').innerHTML=h;S.modal='__ss__'}
-function clrSess(){if(!confirm('Xóa tất cả lịch sử?'))return;S.sessions=[];saveState();showSess()}
+function clrSess(){confirmModal('Xóa tất cả lịch sử?',function(){S.sessions=[];saveState();showSess()})}
 function showSettings(){
   var h='<div class="mo" onclick="clMo(event)"><div class="md" onclick="event.stopPropagation()">';
   h+='<div class="mh"><h2>⚙ Cài đặt</h2><button class="mc" onclick="clMoF()">×</button></div>';
@@ -394,7 +472,7 @@ function showSettings(){
   h+='<div class="slbl">ÂM THANH & RUNG</div>';
   h+='<label style="display:flex;gap:8px;margin-bottom:6px"><input type="checkbox" '+(S.soundEnabled?'checked':'')+' onchange="S.soundEnabled=this.checked"> Âm thanh giao dịch</label>';
   h+='<label style="display:flex;gap:8px;margin-bottom:10px"><input type="checkbox" '+(S.vibrateEnabled?'checked':'')+' onchange="S.vibrateEnabled=this.checked"> Rung khi thực hiện</label>';
-  h+='<div class="slbl">QUY CHUNG</div>';
+  h+='<div class="slbl">QUỸ CHUNG</div>';
   h+='<label style="display:flex;gap:8px;margin-bottom:6px"><input type="checkbox" '+(S.potEnabled?'checked':'')+' onchange="togglePot(this.checked)"> Bật quỹ chung</label>';
   h+='<div class="ca"><input type="number" value="'+(S.pot/1000)+'" oninput="upPot(this.value)" min="0" step="0.5"><span>x 1.000d</span></div>';
   h+='<button class="sbt" onclick="saveState();clMoF();render()">Lưu</button></div></div>';
@@ -430,9 +508,18 @@ function upQD(qi,v){var n=parseFloat(v)*1000;if(!isNaN(n)&&n>0)S.quickDenoms[qi]
 function togglePot(v){S.potEnabled=v;if(!v)S.pot=0;render()}
 function upPot(v){var n=parseFloat(v)*1000;if(isNaN(n)||n<0)n=0;S.pot=Math.round(n/500)*500}
 function resetDefaults(){for(var i=0;i<S.players.length;i++){S.players[i].name='Người chơi '+(i+1);S.players[i].color=COLS[i%COLS.length];S.players[i].emoji=''}render()}
-function splitTotal(){var v=prompt('Nhập tổng tiền cần chia đều (nghìn đồng):','500');if(v===null)return;var t=Math.round(parseFloat(v)*1000);if(isNaN(t)||t<=0)return;var each=Math.floor(t/S.players.length/500)*500;if(each<500)each=500;for(var i=0;i<S.players.length;i++){S.players[i].initial=each;S.players[i].balance=each}render()}
+function splitTotal(){var el=$('splitInp');var v=el?el.value:'';if(!v)return;var t=Math.round(parseFloat(v)*1000);if(isNaN(t)||t<=0)return;var each=Math.floor(t/S.players.length/500)*500;if(each<500)each=500;for(var i=0;i<S.players.length;i++){S.players[i].initial=each;S.players[i].balance=each}render()}
 function toggleCompact(){S.compact=!S.compact;render()}
-function setHistFilter(i){S.histFilter=i;render()}
+function setHistFilter(i){
+  S.histFilter=i;
+  var hlEl=document.querySelector('.hl');
+  if(!hlEl){render();return}
+  var html='';
+  if(S.hist.length===0)html='<div class="hi" style="text-align:center;opacity:.4">Chưa có giao dịch</div>';
+  else{var fr=S.hist.length-1;var shown=0;for(var j=fr;j>=0&&shown<50;j--){if(i>=0){var e=S.hist[j];if(e.f!==i&&e.t.indexOf(i)<0)continue}shown++;html+='<div class="hi"><span style="opacity:.4">'+S.hist[j].time+'</span> '+esc(S.hist[j].text)+'</div>'}}
+  hlEl.innerHTML=html;
+  saveState()
+}
 function setHistFilterFromSel(v){S.histFilter=parseInt(v,10);renderUhModal()}
 function setUhTab(t){uhTab=t;renderUhModal()}
 var pcPressTimer=null,pcPressInterval=null;
