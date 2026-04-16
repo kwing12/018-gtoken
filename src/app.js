@@ -574,6 +574,7 @@ function pcPressEnd(){clearTimeout(pcPressTimer);clearInterval(pcPressInterval)}
 var pkFor=-1;
 function pickAv(i){
   if(pkFor===i){pkFor=-1;var el=$('pkpnl');if(el)el.innerHTML='';return}
+  if(i<0||i>=S.players.length){pkFor=-1;var elx=$('pkpnl');if(elx)elx.innerHTML='';return}
   pkFor=i;var p=S.players[i];
   var h='<div class="pkp"><div class="pk-lbl">Màu sắc</div>';
   h+='<div class="clrs">';
@@ -586,8 +587,8 @@ function pickAv(i){
   if(p.emoji)h+='<div onclick="appEmoji(\'\')" style="font-size:11px;color:var(--dim);cursor:pointer;padding:2px 0">&#10005; Xóa emoji</div>';
   h+='</div>';
   var el=$('pkpnl');if(el)el.innerHTML=h}
-function appClr(c){if(pkFor>=0){S.players[pkFor].color=c;pickAv(-1);pkFor=-1;render()}}
-function appEmoji(em){if(pkFor>=0){S.players[pkFor].emoji=em;pickAv(-1);pkFor=-1;render()}}
+function appClr(c){if(pkFor>=0&&pkFor<S.players.length){S.players[pkFor].color=c;pkFor=-1;var el=$('pkpnl');if(el)el.innerHTML='';render()}}
+function appEmoji(em){if(pkFor>=0&&pkFor<S.players.length){S.players[pkFor].emoji=em;pkFor=-1;var el=$('pkpnl');if(el)el.innerHTML='';render()}}
 
 function startG(){
   var seen={};
