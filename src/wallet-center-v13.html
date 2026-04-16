@@ -2,16 +2,17 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Wallet Center v1.2</title>
+<title>Wallet Center v1.3</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#f0f3f9;--sf:#ffffff;--sf2:#f4f7fe;--bd:#dce4f0;--tx:#1a2640;--dim:#8899b4;
   --grn:#0d9476;--red:#dc2626;--gld:#c9860c;--orn:#e06030;--pur:#7c3aed;
-  --hdbg:rgba(240,243,249,.96);--moBg:rgba(0,0,0,.5);--shd1:rgba(0,0,0,.06);--shd2:rgba(0,0,0,.18)
+  --hdbg:rgba(240,243,249,.96);--moBg:rgba(0,0,0,.5);--shd1:rgba(0,0,0,.06);--shd2:rgba(0,0,0,.18);
+  --radius-card:14px;--gap-list:8px
 }
 html.dark{
   --bg:#090d14;--sf:#111827;--sf2:#192236;--bd:#1e2d42;--tx:#dce8f5;--dim:#4e6077;
@@ -20,10 +21,10 @@ html.dark{
 }
 body{font-family:-apple-system,'Helvetica Neue',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;padding-bottom:env(safe-area-inset-bottom,24px)}
 /* HEADER */
-.hd{position:sticky;top:0;z-index:50;background:var(--hdbg);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:9px 13px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd)}
+.hd{position:sticky;top:0;z-index:50;background:var(--hdbg);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);padding:9px 13px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd)}
 .hd-l{display:flex;align-items:center;gap:7px}
 .hd h1{font-size:13px;font-weight:900;letter-spacing:2.5px;color:var(--gld)}
-.rnd{font-size:10px;font-weight:700;padding:3px 9px;background:var(--sf2);border:1px solid var(--bd);border-radius:20px;color:var(--dim);cursor:pointer;user-select:none}
+.rnd{font-size:10px;font-weight:700;padding:3px 9px;background:var(--sf2);border:1px solid var(--bd);border-radius:20px;color:var(--dim);cursor:pointer;-webkit-user-select:none;user-select:none}
 .rnd b{color:var(--gld)}
 .hd-r{display:flex;gap:4px}
 .ib{width:32px;height:32px;border-radius:9px;background:var(--sf2);border:1px solid var(--bd);color:var(--dim);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
@@ -34,8 +35,8 @@ html.dark .ib.hot{color:var(--gld);border-color:rgba(245,200,66,.4)}
 .ckb{padding:4px 13px;background:var(--sf);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;font-size:10px;font-weight:700;font-family:monospace;color:var(--dim)}
 .ok{color:var(--grn)}.er{color:var(--red)}
 /* PLAYER CARDS */
-.pls{padding:10px 11px;display:flex;flex-direction:column;gap:8px}
-.pc{background:var(--sf);border:1px solid var(--bd);border-radius:14px;display:flex;align-items:stretch;overflow:hidden;box-shadow:0 2px 8px var(--shd1)}
+.pls{padding:10px 11px;display:flex;flex-direction:column;gap:var(--gap-list)}
+.pc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--radius-card);display:flex;align-items:stretch;overflow:hidden;box-shadow:0 2px 8px var(--shd1)}
 .pc:active{transform:scale(.985)}
 .pc.warn{border-color:rgba(224,96,48,.45)}
 .pc.bust{border-color:rgba(220,38,38,.5);box-shadow:0 0 14px rgba(220,38,38,.1)}
@@ -68,7 +69,7 @@ html.dark .qa.qs{border-color:rgba(248,113,113,.3)}html.dark .qa.qr{border-color
 .hl{max-height:130px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
 .hi{font-size:10px;padding:4px 8px;background:var(--sf);border-radius:6px;font-family:monospace;color:var(--dim);line-height:1.4}
 /* MODAL */
-.mo{position:fixed;inset:0;z-index:100;background:var(--moBg);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:flex-end;justify-content:center}
+.mo{position:fixed;inset:0;z-index:100;background:var(--moBg);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);display:flex;align-items:flex-end;justify-content:center}
 .md{background:var(--sf);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;padding:16px 14px 32px;animation:su .2s cubic-bezier(.25,.8,.25,1)}
 @keyframes su{from{transform:translateY(100%);opacity:.4}}
 .mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
@@ -163,6 +164,39 @@ html.dark .ub button{color:#000}
 .ropt .ico{font-size:18px;flex-shrink:0;margin-top:1px}
 .ropt .rdesc{font-size:11px;color:var(--dim);font-weight:400;margin-top:2px;line-height:1.4}
 .ropt.dng{border-color:rgba(220,38,38,.3);color:var(--red)}
+.note{padding:4px 13px;font-size:11px;color:var(--dim);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--sf)}
+.timer-btn{padding:3px 8px;border:1px solid var(--bd);border-radius:14px;background:var(--sf2);font-family:monospace;font-size:11px;font-weight:700;cursor:pointer;color:var(--dim)}
+.timer-btn.run{color:var(--grn);border-color:rgba(13,148,118,.3)}
+.timer-btn.pause{color:var(--orn)}
+.pc.compact .pc-body{padding:8px 8px;gap:8px}
+.pc.compact .av{width:30px;height:30px;border-radius:9px;font-size:13px}
+.pc.compact .bal{font-size:16px}
+.pc.compact .tag{font-size:8px}
+.pc.mini{--radius-card:8px}
+.pc.mini .stripe{width:3px}
+.pc.mini .pc-body{padding:8px 7px;gap:7px}
+.pc.mini .av{width:26px;height:26px;border-radius:8px;font-size:12px}
+.pc.mini .nm{font-size:12px}
+.pc.mini .bal{font-size:14px}
+.pc.mini .pc-r{padding:8px 8px 8px 0}
+.pc.mini .qa-r{display:none}
+.rank-badge{font-size:10px;padding:1px 5px;border-radius:4px;background:var(--sf2);color:var(--dim);border:1px solid var(--bd)}
+.toast-wrap{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(70px + env(safe-area-inset-bottom,0px));z-index:91;display:flex;flex-direction:column;gap:6px;max-width:92vw}
+.toast{padding:8px 11px;border-radius:10px;background:var(--sf);border:1px solid var(--bd);font-size:12px;box-shadow:0 4px 20px var(--shd2)}
+.pc-ctl{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:8px;margin-bottom:12px}
+.pc-step{width:32px;height:32px;border-radius:9px;background:var(--sf2);border:1px solid var(--bd);font-size:18px;cursor:pointer;color:var(--tx)}
+.pc-num{min-width:72px;text-align:center;font-family:monospace;font-size:22px;font-weight:900;color:var(--gld)}
+@media (min-width: 640px){
+  .mo{align-items:center}
+  .md{border-radius:20px;max-width:520px;max-height:85vh;margin:auto;animation:fadeScale .18s ease-out}
+  @keyframes fadeScale{from{opacity:0;transform:scale(.94)}}
+  .pls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .hd h1{font-size:16px}
+  .ib{width:auto;padding:0 12px;gap:5px;font-size:12px}
+}
+@media (min-width: 1024px){
+  .pls{grid-template-columns:1fr 1fr 1fr}
+}
 /* UNDO HISTORY */
 .uhrow{display:flex;align-items:center;gap:7px;padding:7px 9px;background:var(--bg);border-radius:8px;margin-bottom:4px}
 .uhnum{font-size:10px;color:var(--dim);width:18px;text-align:right;flex-shrink:0;font-family:monospace}
@@ -196,23 +230,45 @@ var EMOJIS=['😀','😎','🤩','😈','🦁','🐯','🦊','🐺','🐻','🐼
 var COLS=['#ef4444','#3b82f6','#22d3ae','#f5c842','#a78bfa','#ec4899','#f97316','#84cc16'];
 var DENOMS=[1000,2000,5000,10000,20000,50000];
 var DBAL=100000;
+var timerInterval=null;
+var toastTimer=null;
 
-/* ===== LOAD STATE ===== */
-function mkPlayers(n){var a=[];for(var i=0;i<n;i++)a.push({name:'Player '+(i+1),color:COLS[i%COLS.length],emoji:'',balance:DBAL,initial:DBAL});return a}
-var S;
-try{
-  var sv=JSON.parse(localStorage.getItem('wc_v12')||'null');
-  if(sv&&sv.players&&sv.players.length>=2){
-    S=sv;S.modal=null;S.ap=null;S.atab='send';S.aamt=0;S.atgt=[];S.undoTimer=null;
-    if(!S.quickDenoms)S.quickDenoms=[1000,2000,5000,10000];
-    if(typeof S.dark==='undefined')S.dark=false;
-    if(typeof S.round==='undefined')S.round=1;
-    for(var _i=0;_i<S.players.length;_i++){if(typeof S.players[_i].emoji==='undefined')S.players[_i].emoji=''}
-  }else throw 'no'
-}catch(e){S={phase:'setup',dark:false,players:mkPlayers(5),hist:[],sessions:[],quickDenoms:[1000,2000,5000,10000],modal:null,ap:null,atab:'send',aamt:0,atgt:[],undoStack:[],undoTimer:null,round:1,sortDesc:false}}
-
-/* ===== THEME ===== */
-if(S.dark)document.documentElement.classList.add('dark');
+function mkPlayers(n){var a=[];for(var i=0;i<n;i++)a.push({name:'Nguoi choi '+(i+1),color:COLS[i%COLS.length],emoji:'',balance:DBAL,initial:DBAL});return a}
+function normState(sv){
+  if(!sv||!sv.players||sv.players.length<2)return null;
+  var s=sv;
+  s.modal=null;s.ap=null;s.atab='send';s.aamt=0;s.atgt=[];s.undoTimer=null;
+  if(!s.quickDenoms)s.quickDenoms=[1000,2000,5000,10000];
+  if(!s.hist)s.hist=[];if(!s.sessions)s.sessions=[];
+  if(typeof s.round==='undefined')s.round=1;
+  if(typeof s.sortDesc==='undefined')s.sortDesc=false;
+  if(typeof s.pot==='undefined')s.pot=0;
+  if(typeof s.potEnabled==='undefined')s.potEnabled=false;
+  if(!s.timer)s.timer={startMs:0,elapsed:0,running:false};
+  if(typeof s.pinnedNote==='undefined')s.pinnedNote='';
+  if(typeof s.theme==='undefined')s.theme=(s.dark?'dark':'auto');
+  if(typeof s.compact==='undefined')s.compact=false;
+  if(typeof s.autoTimerStart==='undefined')s.autoTimerStart=false;
+  if(typeof s.showRanks==='undefined')s.showRanks=false;
+  if(typeof s.showTimerAlways==='undefined')s.showTimerAlways=false;
+  if(typeof s.soundEnabled==='undefined')s.soundEnabled=true;
+  if(typeof s.vibrateEnabled==='undefined')s.vibrateEnabled=true;
+  if(!s.txTemplates)s.txTemplates=[];
+  if(!s.histFilter)s.histFilter=-1;
+  if(typeof s.hidePinned==='undefined')s.hidePinned=false;
+  for(var i=0;i<s.players.length;i++){
+    if(typeof s.players[i].emoji==='undefined')s.players[i].emoji='';
+    if(!s.players[i].name)s.players[i].name='Nguoi choi '+(i+1);
+  }
+  return s;
+}
+var S=null;
+try{S=normState(JSON.parse(localStorage.getItem('wc_v13')||'null'))}catch(e){}
+if(!S){
+  try{S=normState(JSON.parse(localStorage.getItem('wc_v12')||'null'))}catch(e){}
+}
+if(!S)S={phase:'setup',players:mkPlayers(5),hist:[],sessions:[],quickDenoms:[1000,2000,5000,10000],modal:null,ap:null,atab:'send',aamt:0,atgt:[],undoStack:[],undoTimer:null,round:1,sortDesc:false,pot:0,potEnabled:false,timer:{startMs:0,elapsed:0,running:false},pinnedNote:'',theme:'auto',compact:false,autoTimerStart:false,showRanks:false,showTimerAlways:false,soundEnabled:true,vibrateEnabled:true,txTemplates:[],histFilter:-1,hidePinned:false};
+applyTheme();
 
 /* ===== UTILS ===== */
 function fmt(n){var a=n<0?-n:n;if(a>=1000000)return(n/1000000).toFixed(a%1000000===0?0:1)+'M';if(a>=1000)return(n/1000).toFixed(a%1000===0?0:1)+'k';return''+n}
@@ -222,78 +278,103 @@ function totBal(){var t=0;for(var i=0;i<S.players.length;i++)t+=S.players[i].bal
 function totInit(){var t=0;for(var i=0;i<S.players.length;i++)t+=S.players[i].initial;return t}
 function $(id){return document.getElementById(id)}
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-function vib(p){try{if(navigator.vibrate)navigator.vibrate(p)}catch(e){}}
-function coin(tp){try{var A=window.AudioContext||window.webkitAudioContext;if(!A)return;var ctx=new A();var o=ctx.createOscillator();var g=ctx.createGain();o.connect(g);g.connect(ctx.destination);if(tp==='s'){o.frequency.setValueAtTime(600,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(300,ctx.currentTime+.15)}else{o.frequency.setValueAtTime(330,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(660,ctx.currentTime+.15)}g.gain.setValueAtTime(.12,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.18);o.start();o.stop(ctx.currentTime+.2)}catch(e){}}
+function vib(p){if(!S.vibrateEnabled)return;try{if(navigator.vibrate)navigator.vibrate(p)}catch(e){}}
+function coin(tp){if(!S.soundEnabled)return;try{var A=window.AudioContext||window.webkitAudioContext;if(!A)return;var ctx=new A();var o=ctx.createOscillator();var g=ctx.createGain();o.connect(g);g.connect(ctx.destination);if(tp==='s'){o.frequency.setValueAtTime(600,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(300,ctx.currentTime+.15)}else{o.frequency.setValueAtTime(330,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(660,ctx.currentTime+.15)}g.gain.setValueAtTime(.12,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.18);o.start();o.stop(ctx.currentTime+.2)}catch(e){}}
 function avHtml(p,cls,sz){var c=cls||'av';var s=sz?'font-size:'+sz+'px;':'';if(p.emoji)return '<div class="'+c+' em" style="'+s+'">'+p.emoji+'</div>';return '<div class="'+c+'" style="background:'+p.color+';'+s+'">'+esc(p.name.charAt(0).toUpperCase())+'</div>'}
+function rankAt(i){var arr=[];for(var k=0;k<S.players.length;k++)arr.push(k);arr.sort(function(a,b){return S.players[b].balance-S.players[a].balance});for(var j=0;j<arr.length;j++){if(arr[j]===i)return j+1}return 99}
+function rankLabel(r){if(r===1)return '🥇';if(r===2)return '🥈';if(r===3)return '🥉';return '#'+r}
+function cardMode(){var n=S.players.length;if(n>=15)return 'mini';if(S.compact||n>=9)return 'compact';return 'full'}
+function fmt2(n){return (n<10?'0':'')+n}
+function getElapsed(){var e=S.timer.elapsed;if(S.timer.running)e+=Date.now()-S.timer.startMs;return e}
+function fmtTime(ms){var s=Math.floor(ms/1000);var h=Math.floor(s/3600);var m=Math.floor((s%3600)/60);var sec=s%60;if(h>0)return h+':'+fmt2(m)+':'+fmt2(sec);return fmt2(m)+':'+fmt2(sec)}
+function startTimer(){S.timer.startMs=Date.now();S.timer.running=true}
+function pauseTimer(){if(S.timer.running){S.timer.elapsed+=Date.now()-S.timer.startMs;S.timer.running=false;S.timer.startMs=0}}
+function resumeTimer(){S.timer.startMs=Date.now();S.timer.running=true}
+function resetTimer(){S.timer={startMs:0,elapsed:0,running:false}}
+function toggleTimer(){if(S.timer.running)pauseTimer();else resumeTimer();saveState();render()}
+function startTimerTick(){if(timerInterval)clearInterval(timerInterval);timerInterval=setInterval(function(){if(S.phase==='playing'&&S.timer.running)updateTimerDisplay()},1000)}
+function updateTimerDisplay(){var el=$('timerEl');if(el)el.textContent=fmtTime(getElapsed())}
+function pushToast(msg){clearTimeout(toastTimer);var wr=$('toast-root');if(!wr)return;wr.innerHTML='<div class="toast">'+esc(msg)+'</div>';toastTimer=setTimeout(function(){if(wr)wr.innerHTML=''},3000)}
+function applyTheme(){var dark=false;if(S.theme==='dark')dark=true;else if(S.theme==='auto'){try{dark=window.matchMedia('(prefers-color-scheme: dark)').matches}catch(e){dark=false}}if(dark)document.documentElement.classList.add('dark');else document.documentElement.classList.remove('dark')}
 
 /* ===== SAVE ===== */
-function saveState(){try{var o={phase:S.phase,dark:S.dark,players:S.players,hist:S.hist,sessions:S.sessions,quickDenoms:S.quickDenoms,undoStack:S.undoStack,round:S.round,sortDesc:S.sortDesc};localStorage.setItem('wc_v12',JSON.stringify(o))}catch(e){}}
+function saveState(){try{pauseTimer();var o={phase:S.phase,players:S.players,hist:S.hist,sessions:S.sessions,quickDenoms:S.quickDenoms,undoStack:S.undoStack,round:S.round,sortDesc:S.sortDesc,pot:S.pot,potEnabled:S.potEnabled,timer:S.timer,pinnedNote:S.pinnedNote,theme:S.theme,compact:S.compact,autoTimerStart:S.autoTimerStart,showRanks:S.showRanks,showTimerAlways:S.showTimerAlways,soundEnabled:S.soundEnabled,vibrateEnabled:S.vibrateEnabled,txTemplates:S.txTemplates,histFilter:S.histFilter,hidePinned:S.hidePinned};localStorage.setItem('wc_v13',JSON.stringify(o))}catch(e){}}
 
 /* ===== RENDER ===== */
 function render(){var a=$('app');if(S.phase==='setup')a.innerHTML=rSetup();else a.innerHTML=rPlay();saveState()}
 
 /* ===== THEME TOGGLE ===== */
-function toggleTheme(){S.dark=!S.dark;if(S.dark)document.documentElement.classList.add('dark');else document.documentElement.classList.remove('dark');saveState();render()}
+function toggleTheme(){if(S.theme==='auto')S.theme='dark';else if(S.theme==='dark')S.theme='light';else S.theme='auto';applyTheme();saveState();render()}
 
 /* ===== SETUP ===== */
 function rSetup(){
   var h='<div style="padding:20px 14px;min-height:100vh;display:flex;flex-direction:column">';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">';
   h+='<div><div style="font-size:22px;font-weight:900;letter-spacing:3px;color:var(--gld)">WALLET CENTER</div>';
-  h+='<div style="font-size:10px;color:var(--dim);margin-top:3px;letter-spacing:2px">v1.2 &mdash; CA CUOC GHI SO</div></div>';
-  h+='<button onclick="toggleTheme()" class="ib" style="width:36px;height:36px">'+(S.dark?'&#9788;':'&#9790;')+'</button></div>';
+  h+='<div style="font-size:10px;color:var(--dim);margin-top:3px;letter-spacing:2px">v1.3 &mdash; TRUNG TAM VI</div></div>';
+  h+='<button onclick="toggleTheme()" class="ib" style="width:36px;height:36px">'+(S.theme==='dark'?'☀':'◐')+'</button></div>';
   h+='<div style="flex:1">';
-  h+='<div class="slbl" style="margin-bottom:8px">So nguoi choi</div>';
-  h+='<div style="display:flex;gap:5px;margin-bottom:18px">';
-  for(var ci=0;ci<5;ci++){var cn=ci+2;var ac=(S.players.length===cn);
-    h+='<button onclick="setPC('+cn+')" style="flex:1;padding:9px 0;border-radius:10px;border:1.5px solid '+(ac?'var(--gld)':'var(--bd)')+';background:'+(ac?'rgba(201,134,12,.1)':'var(--sf)')+';color:'+(ac?'var(--gld)':'var(--tx)')+';font-size:15px;font-weight:800;cursor:pointer;font-family:monospace">'+cn+'</button>'}
-  h+='</div>';
-  h+='<div class="slbl" style="margin-bottom:8px">Nguoi choi</div>';
+  h+='<div class="slbl" style="margin-bottom:8px">So nguoi choi (2-20)</div>';
+  h+='<div class="pc-ctl"><button class="pc-step" onmousedown="pcPressStart(-1)" onmouseup="pcPressEnd()" onmouseleave="pcPressEnd()" ontouchstart="pcPressStart(-1)" ontouchend="pcPressEnd()">-</button><div class="pc-num">'+S.players.length+'</div><button class="pc-step" onmousedown="pcPressStart(1)" onmouseup="pcPressEnd()" onmouseleave="pcPressEnd()" ontouchstart="pcPressStart(1)" ontouchend="pcPressEnd()">+</button></div>';
+  h+='<button class="btn-ghost" onclick="resetDefaults()">Dat tat ca ve mac dinh</button>';
+  h+='<button class="btn-ghost" onclick="splitTotal()">Chia deu tu tong</button>';
+  h+='<div class="slbl" style="margin-bottom:8px;margin-top:10px">Nguoi choi</div>';
+  h+='<div style="'+(S.players.length>8?'max-height:320px;overflow-y:auto;':'')+'">';
   for(var i=0;i<S.players.length;i++){var p=S.players[i];
-    var avStyle='background:'+p.color;
     var avContent=p.emoji?p.emoji:esc(p.name.charAt(0).toUpperCase());
     var avClass='sav'+(p.emoji?' em':'');
-    h+='<div class="srow"><div class="'+avClass+'" style="'+(p.emoji?'':'background:'+p.color)+'" onclick="pickAv('+i+')">'+avContent+'</div>';
-    h+='<input class="snm" value="'+esc(p.name)+'" oninput="upName('+i+',this.value)" placeholder="Ten...">';
+    h+='<div class="srow" style="'+(S.players.length>8?'height:44px;':'')+'"><div class="'+avClass+'" style="'+(p.emoji?'':'background:'+p.color)+'" onclick="pickAv('+i+')">'+avContent+'</div>';
+    h+='<input class="snm" value="'+esc(p.name)+'" oninput="upName('+i+',this.value)" placeholder="Ten nguoi choi">';
     h+='<input class="sbal" value="'+(p.initial/1000)+'" oninput="upBal('+i+',this.value)" type="number" step="0.5" min="0.5"><span class="sdim">k</span></div>'}
+  h+='</div>';
   h+='<div id="pkpnl"></div>';
   h+='<div style="margin-top:14px;border-top:1px solid var(--bd);padding-top:12px">';
+  h+='<label style="display:flex;align-items:center;gap:7px;font-size:12px;margin-bottom:8px"><input type="checkbox" '+(S.potEnabled?'checked':'')+' onchange="togglePot(this.checked)"> Bat Quy Chung</label>';
+  if(S.potEnabled)h+='<div class="ca"><input type="number" value="'+(S.pot/1000)+'" oninput="upPot(this.value)" min="0" step="0.5"><span>x 1.000d</span></div>';
+  h+='<label style="display:flex;align-items:center;gap:7px;font-size:12px;margin-bottom:8px"><input type="checkbox" '+(S.autoTimerStart?'checked':'')+' onchange="S.autoTimerStart=this.checked"> Bat dau dem gio ngay khi bat dau tran</label>';
   h+='<div class="slbl" style="margin-bottom:6px">Muc tien nhanh (4 nut quick)</div>';
   h+='<div class="qd-row">';
   for(var qi=0;qi<4;qi++)h+='<input class="qdinp" value="'+(S.quickDenoms[qi]/1000)+'" oninput="upQD('+qi+',this.value)" type="number" step="0.5" min="0.5" placeholder="k">';
-  h+='</div></div>';
+  h+='</div>';
+  h+='<div class="slbl" style="margin-bottom:6px">Ghi chu tran (toi da 80 ky tu)</div>';
+  h+='<input class="snm" value="'+esc(S.pinnedNote)+'" maxlength="80" oninput="S.pinnedNote=this.value" placeholder="Nhap ghi chu"></div>';
   h+='<div style="margin-top:6px;padding:10px 13px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;display:flex;justify-content:space-between;align-items:center">';
-  h+='<span style="font-size:11px;color:var(--dim)">Tong von vao ban</span>';
-  h+='<span id="totLbl" style="font-family:monospace;font-size:14px;font-weight:800;color:var(--gld)">'+ff(totInit())+'</span></div></div>';
-  h+='<button class="sbt" onclick="startG()">BAT DAU TRAN DAU &#9654;</button>';
+  h+='<span style="font-size:11px;color:var(--dim)">Tong von vao ban'+(S.potEnabled?' + quy':'')+'</span>';
+  h+='<span id="totLbl" style="font-family:monospace;font-size:14px;font-weight:800;color:var(--gld)">'+ff(totInit()+S.pot)+'</span></div></div>';
+  h+='<button class="sbt" onclick="startG()">BAT DAU TRAN DAU ▶</button>';
   if(S.sessions.length>0)h+='<button onclick="showSess()" class="btn-ghost" style="margin-top:8px">&#128203; Lich su ('+S.sessions.length+' tran dau)</button>';
   h+='</div>';return h}
 
 /* ===== PLAY ===== */
 function rPlay(){
-  var tot=totBal(),ti=totInit(),ok=(tot===ti),undoCnt=S.undoStack.length;
+  var tot=totBal()+S.pot,ti=totInit()+S.pot,ok=(tot===ti),undoCnt=S.undoStack.length,mode=cardMode();
   var h='<div class="hd"><div class="hd-l"><h1>WALLET CENTER</h1>';
   h+='<div class="rnd" onclick="incRound()">Vong <b>'+S.round+'</b></div></div>';
   h+='<div class="hd-r">';
-  h+='<button class="ib'+(undoCnt>0?' hot':'')+'" onclick="showUndoHist()" title="GD & Hoan tac">&#8635;'+(undoCnt>0?' '+undoCnt:'')+'</button>';
-  h+='<button class="ib'+(S.sortDesc?' hot':'')+'" onclick="toggleSort()" title="Sap xep">&#8597;</button>';
-  h+='<button class="ib" onclick="toggleTheme()" title="Theme">'+(S.dark?'&#9788;':'&#9790;')+'</button>';
-  h+='<button class="ib" onclick="showSess()" title="Lich su">&#128203;</button>';
-  h+='<button class="ib" onclick="showReset()" title="Reset">&#9111;</button>';
+  h+='<button class="ib'+(undoCnt>0?' hot':'')+'" onclick="showUndoHist()" title="Hoan tac">↺'+(undoCnt>0?' '+undoCnt:'')+'</button>';
+  h+='<button class="ib'+(S.sortDesc?' hot':'')+'" onclick="toggleSort()" title="Sap xep">⇅</button>';
+  h+='<button class="ib'+(S.compact?' hot':'')+'" onclick="toggleCompact()" title="Che do gon">'+(S.compact?'≡':'⊞')+'</button>';
+  h+='<button class="ib" onclick="showSettings()" title="Cai dat">⚙</button>';
+  h+='<button class="ib" onclick="showUndoHist()" title="Lich su">📋</button>';
+  h+='<button class="ib" onclick="showReset()" title="Reset">⊙</button>';
   h+='</div></div>';
+  if(S.pinnedNote&&!S.hidePinned)h+='<div class="note"><span>'+esc(S.pinnedNote)+'</span><button class="mc" style="width:22px;height:22px" onclick="S.hidePinned=true;render()">×</button></div>';
   h+='<div class="ckb"><span>'+S.hist.length+' GD &bull; Tong: <b style="color:var(--tx)">'+ff(tot)+'</b></span>';
   h+='<span class="'+(ok?'ok':'er')+'">'+(ok?'&#10003; Hop le':'&#10007; LECH')+'</span></div>';
+  if(S.showTimerAlways||S.timer.running||getElapsed()>0){h+='<div style="padding:7px 13px;border-bottom:1px solid var(--bd);display:flex;justify-content:flex-end"><button id="timerElBtn" class="timer-btn '+(S.timer.running?'run':'pause')+'" onclick="toggleTimer()">'+(S.timer.running?'⏸ ':'▶ ')+'<span id="timerEl">'+fmtTime(getElapsed())+'</span></button></div>'}
   h+='<div class="pls">';
+  if(S.potEnabled){h+='<div class="pc compact" onclick="openPotAct()"><div class="stripe" style="background:var(--gld)"></div><div class="pc-body"><div class="av" style="background:var(--gld)">💰</div><div class="inf"><div class="nm">Quy Chung</div><div class="bal">'+ff(S.pot)+'</div></div></div><div class="pc-r"><div class="dl dz">Quy</div></div></div>'}
   var idxs=[];for(var k=0;k<S.players.length;k++)idxs.push(k);
   if(S.sortDesc)idxs.sort(function(a,b){return S.players[b].balance-S.players[a].balance});
   for(var ii=0;ii<idxs.length;ii++){
     var i=idxs[ii];var p=S.players[i];var d=p.balance-p.initial;
     var dc=d>0?'dp':d<0?'dn':'dz';var ds=d>0?'+'+fmt(d):d<0?fmt(d):'0';
     var bust=(p.balance===0);var warn=(!bust&&p.balance<p.initial*.25);
-    h+='<div class="pc'+(bust?' bust':warn?' warn':'')+'"><div class="stripe" style="background:'+p.color+'"></div>';
+    h+='<div class="pc '+mode+(bust?' bust':warn?' warn':'')+'"><div class="stripe" style="background:'+p.color+'"></div>';
     h+='<div class="pc-body" onclick="openAct('+i+')">';
     h+=avHtml(p,'av');
     h+='<div class="inf"><div class="nm">'+esc(p.name);
+    if(S.showRanks){var rk=rankAt(i);h+='<span class="rank-badge">'+rankLabel(rk)+'</span>'}
     if(bust)h+='<span class="tag" style="background:rgba(220,38,38,.1);color:var(--red)">HET TIEN</span>';
     else if(warn)h+='<span class="tag" style="background:rgba(224,96,48,.1);color:var(--orn)">SAP HET</span>';
     h+='</div><div class="bal">'+ff(p.balance)+'</div></div></div>';
@@ -302,33 +383,39 @@ function rPlay(){
     h+='<div class="qa qs" onclick="openActQ(event,'+i+',\'send\')" title="Gui tat ca">&#8594;</div>';
     h+='<div class="qa qr" onclick="openActQ(event,'+i+',\'receive\')" title="Nhan tat ca">&#8592;</div>';
     h+='</div></div></div>'}
-  h+='</div><div class="hs"><div class="hs-hd">Giao dich gan day</div><div class="hl">';
+  h+='</div><div class="hs"><div class="hs-hd">Giao dich gan day</div>';
+  h+='<div style="display:flex;gap:4px;overflow:auto;margin-bottom:5px"><button class="btn-ghost" style="margin:0;padding:5px 8px;font-size:10px" onclick="setHistFilter(-1)">Tat ca</button>';
+  for(var hf=0;hf<S.players.length;hf++)h+='<button class="btn-ghost" style="margin:0;padding:5px 8px;font-size:10px" onclick="setHistFilter('+hf+')">'+esc(S.players[hf].name)+'</button>';
+  h+='</div><div class="hl">';
   if(S.hist.length===0)h+='<div class="hi" style="text-align:center;opacity:.4">Chua co giao dich</div>';
-  else{var fr=S.hist.length-1;for(var i=fr;i>=0&&i>=fr-19;i--)h+='<div class="hi"><span style="opacity:.4">'+S.hist[i].time+'</span> '+esc(S.hist[i].text)+'</div>'}
-  h+='</div></div>';return h}
+  else{var fr=S.hist.length-1;var shown=0;for(var i=fr;i>=0&&shown<50;i--){if(S.histFilter>=0){var e=S.hist[i];if(e.f!==S.histFilter&&e.t.indexOf(S.histFilter)<0)continue}shown++;h+='<div class="hi"><span style="opacity:.4">'+S.hist[i].time+'</span> '+esc(S.hist[i].text)+'</div>'}}
+  h+='</div></div><div id="toast-root" class="toast-wrap"></div>';return h}
 
 /* ===== ACTION MODAL ===== */
 function rActModal(){
-  var p=S.players[S.ap];var is=(S.atab==='send');
+  var p=(S.ap===-1?{name:'Quy Chung',emoji:'💰',color:'#c9860c',balance:S.pot}:S.players[S.ap]);var is=(S.atab==='send');
   var h='<div class="mo" onclick="clMo(event)"><div class="md" onclick="event.stopPropagation()">';
   h+='<div class="mh"><h2>'+avHtml(p,'av2',16)+' '+esc(p.name)+'</h2><button class="mc" onclick="clMoF()">&#10005;</button></div>';
   h+='<div style="text-align:center;margin-bottom:12px;font-family:monospace;font-size:28px;font-weight:800">'+ff(p.balance)+'</div>';
   h+='<div class="mtabs"><button id="t0" class="mtab'+(is?' on':'')+'" onclick="setTab(\'send\')">&#8594; GUI</button><button id="t1" class="mtab'+(!is?' on':'')+'" onclick="setTab(\'receive\')">&#8592; NHAN</button></div>';
+  if(S.txTemplates.length>0){h+='<div class="slbl">MAU GIAO DICH</div><div style="display:flex;gap:5px;overflow:auto;margin-bottom:8px">';for(var ti=0;ti<S.txTemplates.length;ti++){h+='<button class="btn-ghost" style="margin:0;padding:6px 8px;white-space:nowrap" onclick="applyTpl('+ti+')">★ '+esc(S.txTemplates[ti].name)+'</button>'}h+='</div>'}
   h+='<div class="slbl">NHANH &mdash; CHON LUON TAT CA</div>';
   h+='<div class="qrow">';
   for(var di=0;di<4;di++){h+='<button class="qrb '+(is?'qs':'qr')+'" onclick="quickAllByIdx('+di+')">'+(is?'&#8594;':'&#8592;')+fmt(S.quickDenoms[di])+'</button>'}
+  h+='<button class="qrb" onclick="openCustomAmt()">Khac</button>';
   h+='</div>';
   h+='<div class="slbl">SO TIEN</div><div class="ag">';
   for(var di=0;di<DENOMS.length;di++){var d=DENOMS[di];h+='<button class="ab" data-amt="'+d+'" onclick="setAmt('+d+')">'+fmt(d)+'</button>'}
   h+='</div>';
-  h+='<div class="ca"><input type="number" id="camt" placeholder="So khac..." oninput="setCamt(this.value)" step="0.5" min="0"><span>x 1.000d</span></div>';
+  h+='<div class="ca"><input type="number" id="camt" placeholder="So khac" oninput="setCamt(this.value)" step="0.5" min="0"><span>x 1.000d</span></div>';
   h+='<div class="slbl" id="tgtLbl">'+(is?'GUI CHO':'NHAN TU')+'</div>';
-  h+='<button class="albt" id="btnAll" onclick="togAll()">'+(is?'&#9654; Gui cho TAT CA':'&#9664; Nhan tu TAT CA')+'</button>';
+  h+='<button class="albt" id="btnAll" onclick="togAll()">'+(is?'▶ Gui cho TAT CA':'◀ Nhan tu TAT CA')+'</button>';
   h+='<div class="tg">';
+  if(S.potEnabled&&S.ap!==-1)h+='<div class="tr" data-idx="-1" onclick="togTgt(-1)"><div class="av2" style="background:var(--gld)">💰</div><span class="tn">Quy chung</span><span class="tb">'+ff(S.pot)+'</span><span class="ck2">&#10003;</span></div>';
   for(var i=0;i<S.players.length;i++){if(i===S.ap)continue;var o=S.players[i];
     h+='<div class="tr" data-idx="'+i+'" onclick="togTgt('+i+')">'+avHtml(o,'av2',16)+'<span class="tn">'+esc(o.name)+'</span><span class="tb">'+ff(o.balance)+'</span><span class="ck2">&#10003;</span></div>'}
   h+='</div>';
-  h+='<div class="errmsg" id="errMsg"></div>';
+  h+='<button class="btn-ghost" onclick="saveTpl()">★ Luu mau</button><div class="errmsg" id="errMsg"></div>';
   h+='<button class="exb '+(is?'s':'r')+'" id="btnExec" onclick="execAct()" disabled>'+(is?'GUI':'NHAN')+'</button>';
   h+='</div></div>';return h}
 
@@ -340,7 +427,7 @@ function updAmt(){
 function updTgt(){
   var rows=document.querySelectorAll('.tr');
   for(var i=0;i<rows.length;i++){var idx=parseInt(rows[i].getAttribute('data-idx'),10);if(S.atgt.indexOf(idx)>=0)rows[i].classList.add('sel');else rows[i].classList.remove('sel')}
-  var others=[];for(var i=0;i<S.players.length;i++){if(i!==S.ap)others.push(i)}
+  var others=[];for(var i=0;i<S.players.length;i++){if(i!==S.ap)others.push(i)}if(S.potEnabled&&S.ap!==-1)others.push(-1);
   var ba=$('btnAll');if(ba){if(S.atgt.length===others.length&&others.length>0)ba.classList.add('sel');else ba.classList.remove('sel')}
   updBtn()}
 function updBtn(){
@@ -358,7 +445,7 @@ function setTab(t){
   if(t0){if(is)t0.classList.add('on');else t0.classList.remove('on')}
   if(t1){if(!is)t1.classList.add('on');else t1.classList.remove('on')}
   var lbl=$('tgtLbl');if(lbl)lbl.textContent=is?'GUI CHO':'NHAN TU';
-  var ba=$('btnAll');if(ba){ba.textContent=is?'\u25b6 Gui cho TAT CA':'\u25c4 Nhan tu TAT CA';ba.classList.remove('sel')}
+  var ba=$('btnAll');if(ba){ba.textContent=is?'▶ Gui cho TAT CA':'◀ Nhan tu TAT CA';ba.classList.remove('sel')}
   var exb=$('btnExec');if(exb){exb.classList.remove('s','r');exb.classList.add(is?'s':'r')}
   var qbs=document.querySelectorAll('.qrb');
   for(var i=0;i<qbs.length;i++){qbs[i].classList.remove('qs','qr');qbs[i].classList.add(is?'qs':'qr');qbs[i].textContent=(is?'\u2192':'\u2190')+fmt(S.quickDenoms[i])}
@@ -368,29 +455,40 @@ function setTab(t){
 function setAmt(a){S.aamt=a;var ci=$('camt');if(ci)ci.value='';updAmt()}
 function setCamt(v){var n=parseFloat(v)*1000;S.aamt=(!isNaN(n)&&n>0)?n:0;var btns=document.querySelectorAll('.ab');for(var i=0;i<btns.length;i++)btns[i].classList.remove('sel');updBtn()}
 function togTgt(idx){var i=S.atgt.indexOf(idx);if(i>=0)S.atgt.splice(i,1);else S.atgt.push(idx);updTgt()}
-function togAll(){var others=[];for(var i=0;i<S.players.length;i++){if(i!==S.ap)others.push(i)}if(S.atgt.length===others.length){S.atgt=[]}else{S.atgt=[];for(var i=0;i<others.length;i++)S.atgt.push(others[i])}updTgt()}
+function togAll(){var others=[];for(var i=0;i<S.players.length;i++){if(i!==S.ap)others.push(i)}if(S.potEnabled&&S.ap!==-1)others.push(-1);if(S.atgt.length===others.length){S.atgt=[]}else{S.atgt=[];for(var i=0;i<others.length;i++)S.atgt.push(others[i])}updTgt();var ba=$('btnAll');if(ba){if(S.atgt.length===others.length)ba.textContent='✓ Da chon TAT CA - Bo chon';else ba.textContent=(S.atab==='send'?'▶ Gui cho TAT CA':'◀ Nhan tu TAT CA')}}
 function quickAllByIdx(qi){
   S.aamt=S.quickDenoms[qi];
-  var others=[];for(var i=0;i<S.players.length;i++){if(i!==S.ap)others.push(i)}
+  var others=[];for(var i=0;i<S.players.length;i++){if(i!==S.ap)others.push(i)}if(S.potEnabled&&S.ap!==-1)others.push(-1);
   S.atgt=[];for(var i=0;i<others.length;i++)S.atgt.push(others[i]);
   var ci=$('camt');if(ci)ci.value='';updAmt();updTgt()}
-
-function showErr(msg){var el=$('errMsg');if(!el)return;el.textContent=msg;el.style.display='block';clearTimeout(el._t);el._t=setTimeout(function(){if(el)el.style.display='none'},3500)}
+function openCustomAmt(){var v=prompt('Nhap so tien (nghin dong):','5');if(v===null)return;setCamt(v)}
+function showErr(msg){var el=$('errMsg');if(!el)return;el.innerHTML='<span>'+esc(msg)+'</span><button style="float:right;border:none;background:transparent;color:var(--red);cursor:pointer" onclick="this.parentNode.style.display=\'none\'">×</button>';el.style.display='block';clearTimeout(el._t);el._t=setTimeout(function(){if(el)el.style.display='none'},4000)}
+function saveTpl(){if(S.aamt<=0||S.atgt.length===0){showErr('Can chon so tien va nguoi nhan');return}var n=prompt('Ten mau giao dich:','Mau '+(S.txTemplates.length+1));if(!n)return;var t={name:n,tab:S.atab,amt:S.aamt,selectAll:(S.atgt.length===S.players.length-1)};if(S.txTemplates.length>=5)S.txTemplates.shift();S.txTemplates.push(t);saveState();render();openAct(S.ap);S.aamt=t.amt;updAmt()}
+function applyTpl(i){var t=S.txTemplates[i];if(!t)return;setTab(t.tab);S.aamt=t.amt;if(t.selectAll)togAll();updAmt()}
 
 /* ===== EXECUTE ===== */
 function execAct(){
   var amt=S.aamt,pi=S.ap,p=S.players[pi],is=(S.atab==='send'),tgts=S.atgt.slice();
   if(amt<=0||tgts.length===0)return;
-  if(is){if(p.balance<amt*tgts.length){showErr(p.name+' khong du tien! Can '+ff(amt*tgts.length)+', co '+ff(p.balance));return}}
-  else{for(var i=0;i<tgts.length;i++){var tp=S.players[tgts[i]];if(tp.balance<amt){showErr(tp.name+' khong du tien (co '+ff(tp.balance)+')');return}}}
+  var srcBal=(pi===-1?S.pot:p.balance);
+  if(is){if(srcBal<amt*tgts.length){showErr((pi===-1?'Quy chung':p.name)+' khong du tien! Thieu '+ff(amt*tgts.length-srcBal));return}}
+  else{for(var i=0;i<tgts.length;i++){if(tgts[i]===-1){if(S.pot<amt){showErr('Quy chung khong du tien (co '+ff(S.pot)+')');return}}else{var tp=S.players[tgts[i]];if(tp.balance<amt){showErr(tp.name+' khong du tien (co '+ff(tp.balance)+')');return}}}}
   var snap=[];for(var i=0;i<S.players.length;i++)snap.push(S.players[i].balance);
+  var snapPot=S.pot;
   var names=[];
-  if(is){p.balance-=amt*tgts.length;for(var i=0;i<tgts.length;i++){S.players[tgts[i]].balance+=amt;names.push(S.players[tgts[i]].name)}
-    S.hist.push({time:tnow(),text:p.name+' \u2192 '+names.join(', ')+': '+ff(amt)+(tgts.length>1?' moi ng':''),f:pi,t:tgts.slice(),a:amt,tp:'s'})}
-  else{for(var i=0;i<tgts.length;i++){S.players[tgts[i]].balance-=amt;names.push(S.players[tgts[i]].name)}p.balance+=amt*tgts.length;
-    S.hist.push({time:tnow(),text:p.name+' \u2190 '+names.join(', ')+': '+ff(amt)+(tgts.length>1?' moi ng':''),f:pi,t:tgts.slice(),a:amt,tp:'r'})}
-  S.undoStack.push({snap:snap,idx:S.hist.length-1});
+  if(is){
+    if(pi===-1)S.pot-=amt*tgts.length;else p.balance-=amt*tgts.length;
+    for(var i=0;i<tgts.length;i++){if(tgts[i]===-1){S.pot+=amt;names.push('Quy chung')}else{S.players[tgts[i]].balance+=amt;names.push(S.players[tgts[i]].name)}}
+    S.hist.push({time:tnow(),text:(pi===-1?'Quy chung':p.name)+' → '+names.join(', ')+': '+ff(amt)+(tgts.length>1?' moi nguoi':''),f:pi,t:tgts.slice(),a:amt,tp:'s'})
+  }else{
+    for(var i=0;i<tgts.length;i++){if(tgts[i]===-1){S.pot-=amt;names.push('Quy chung')}else{S.players[tgts[i]].balance-=amt;names.push(S.players[tgts[i]].name)}}
+    if(pi===-1)S.pot+=amt*tgts.length;else p.balance+=amt*tgts.length;
+    S.hist.push({time:tnow(),text:(pi===-1?'Quy chung':p.name)+' ← '+names.join(', ')+': '+ff(amt)+(tgts.length>1?' moi nguoi':''),f:pi,t:tgts.slice(),a:amt,tp:'r'})
+  }
+  S.undoStack.push({snap:snap,snapPot:snapPot,idx:S.hist.length-1});
   if(S.undoStack.length>20)S.undoStack.shift();
+  for(var bi=0;bi<S.players.length;bi++){if(S.players[bi].balance===0)pushToast('💥 '+S.players[bi].name+' vua HET TIEN!')}
+  var rk=rankAt(S.sortDesc?0:0);if(rk===1&&S.players.length>1)pushToast('🏆 '+S.players[0].name+' dang dan dau!');
   vib(25);coin(is?'s':'r');showUndoBar();clMoF();render()}
 
 /* ===== UNDO ===== */
@@ -404,6 +502,7 @@ function doUndo(){
   if(S.undoStack.length===0)return;
   var u=S.undoStack.pop();
   for(var i=0;i<u.snap.length;i++)S.players[i].balance=u.snap[i];
+  if(typeof u.snapPot!=='undefined')S.pot=u.snapPot;
   S.hist.splice(u.idx,1);
   $('undo-root').innerHTML='';if(S.undoTimer)clearTimeout(S.undoTimer);
   vib([15,10,15]);render()}
@@ -416,24 +515,33 @@ function calcStats(){
     if(e.tp==='s'){s[e.f].out+=e.a*e.t.length;s[e.f].cnt++;for(var j=0;j<e.t.length;j++)s[e.t[j]].inp+=e.a}
     else if(e.tp==='r'){s[e.f].inp+=e.a*e.t.length;s[e.f].cnt++;for(var j=0;j<e.t.length;j++)s[e.t[j]].out+=e.a}}
   return s}
+function calcDebts(){
+  var balances=[];for(var i=0;i<S.players.length;i++){var net=S.players[i].balance-S.players[i].initial;if(Math.abs(net)>0)balances.push({idx:i,net:net})}
+  var debtors=[],creditors=[];for(var j=0;j<balances.length;j++){if(balances[j].net<0)debtors.push({idx:balances[j].idx,amt:-balances[j].net});else if(balances[j].net>0)creditors.push({idx:balances[j].idx,amt:balances[j].net})}
+  var txs=[],di=0,ci=0;while(di<debtors.length&&ci<creditors.length){var d=debtors[di],c=creditors[ci],amt=Math.min(d.amt,c.amt);txs.push({from:d.idx,to:c.idx,amount:amt});d.amt-=amt;c.amt-=amt;if(d.amt===0)di++;if(c.amt===0)ci++}
+  return txs
+}
 
 /* ===== UNDO HISTORY & STATS MODAL ===== */
 var uhTab='hist';
+var statsSort='delta';
 function showUndoHist(){uhTab='hist';renderUhModal()}
-function setUhTab(t){uhTab=t;var h0=$('uht0');var h1=$('uht1');var c0=$('uhc0');var c1=$('uhc1');if(!h0)return;if(t==='hist'){h0.classList.add('on');h1.classList.remove('on');if(c0)c0.style.display='';if(c1)c1.style.display='none'}else{h1.classList.add('on');h0.classList.remove('on');if(c1)c1.style.display='';if(c0)c0.style.display='none'}}
 function renderUhModal(){
   var undoCnt=S.undoStack.length;
   var h='<div class="mo" onclick="clMo(event)"><div class="md" onclick="event.stopPropagation()">';
   h+='<div class="mh"><h2>&#8635; Lich su & Thong ke</h2><button class="mc" onclick="clMoF()">&#10005;</button></div>';
-  h+='<div class="mtabs"><button id="uht0" class="mtab'+(uhTab==='hist'?' on':'')+'" onclick="setUhTab(\'hist\')">&#128195; Giao dich</button><button id="uht1" class="mtab'+(uhTab==='stats'?' on':'')+'" onclick="setUhTab(\'stats\')">&#128202; Thong ke</button></div>';
+  h+='<div class="mtabs"><button id="uht0" class="mtab'+(uhTab==='hist'?' on':'')+'" onclick="setUhTab(\'hist\')">&#128195; Giao dich</button><button id="uht1" class="mtab'+(uhTab==='stats'?' on':'')+'" onclick="setUhTab(\'stats\')">&#128202; Thong ke</button><button class="mtab'+(uhTab==='res'?' on':'')+'" onclick="setUhTab(\'res\')">🏁 Ket qua</button></div>';
   // HISTORY TAB
   h+='<div id="uhc0" style="'+(uhTab!=='hist'?'display:none':'')+'"">';
   if(undoCnt>0)h+='<button onclick="doUndoH()" style="width:100%;padding:10px;border-radius:10px;background:rgba(201,134,12,.1);border:1.5px solid rgba(201,134,12,.35);color:var(--gld);font-size:13px;font-weight:800;cursor:pointer;margin-bottom:12px">&#8635; HOAN TAC GD GAN NHAT <span style="font-size:11px;opacity:.7">(con '+undoCnt+' lan)</span></button>';
   else h+='<div style="padding:4px 0 10px;font-size:11px;color:var(--dim)">Khong con giao dich de hoan tac.</div>';
   if(S.hist.length===0)h+='<div style="text-align:center;padding:16px;color:var(--dim);font-size:12px">Chua co giao dich</div>';
-  else{h+='<div class="slbl" style="margin-bottom:6px">10 giao dich gan nhat</div>';
+  else{h+='<div class="slbl" style="margin-bottom:6px">Tat ca giao dich</div>';
+    h+='<select onchange="setHistFilterFromSel(this.value)" style="width:100%;padding:8px;border:1px solid var(--bd);border-radius:8px;margin-bottom:7px;background:var(--bg);color:var(--tx)"><option value="-1">Loc: Tat ca</option>';
+    for(var op=0;op<S.players.length;op++)h+='<option value="'+op+'" '+(S.histFilter===op?'selected':'')+'>'+esc(S.players[op].name)+'</option>';
+    h+='</select>';
     var fr=S.hist.length-1;var cnt=0;
-    for(var i=fr;i>=0&&cnt<10;i--,cnt++){h+='<div class="uhrow"><span class="uhnum">'+(i+1)+'</span><span class="uhtxt">'+esc(S.hist[i].text)+'</span><span class="uhtime">'+S.hist[i].time+'</span></div>'}}
+    for(var i=fr;i>=0&&cnt<999;i--){if(S.histFilter>=0&&S.hist[i].f!==S.histFilter&&S.hist[i].t.indexOf(S.histFilter)<0)continue;cnt++;h+='<div class="uhrow"><span class="uhnum">'+(i+1)+'</span><span class="uhtxt">'+esc(S.hist[i].text)+'</span><span class="uhtime">'+S.hist[i].time+'</span></div>'}}
   h+='<button onclick="copyResult()" class="btn-ghost" style="margin-top:8px">&#128203; Copy ket qua hien tai</button>';
   h+='</div>';
   // STATS TAB
@@ -447,13 +555,20 @@ function renderUhModal(){
   h+='</div>';
   h+='<div class="stat-hd"><div style="width:32px;flex-shrink:0"></div><div style="flex:1"></div><div class="stat-col" style="color:var(--red)">Da trai</div><div class="stat-col" style="color:var(--grn)">Da nhan</div><div class="stat-col">Chenh lech</div></div>';
   var sorted=[];for(var i=0;i<S.players.length;i++)sorted.push(i);
-  sorted.sort(function(a,b){return (S.players[b].balance-S.players[b].initial)-(S.players[a].balance-S.players[a].initial)});
+  sorted.sort(function(a,b){if(statsSort==='name')return S.players[a].name.localeCompare(S.players[b].name);if(statsSort==='count')return stats[b].cnt-stats[a].cnt;return (S.players[b].balance-S.players[b].initial)-(S.players[a].balance-S.players[a].initial)});
   for(var si=0;si<sorted.length;si++){var i=sorted[si];var p=S.players[i];var st=stats[i];var nd=p.balance-p.initial;var dc2=nd>0?'var(--grn)':nd<0?'var(--red)':'var(--dim)';
     h+='<div class="stat-r">'+avHtml(p,'stat-av',16)+'<span class="stat-nm">'+esc(p.name)+'</span>';
     h+='<div class="stat-col" style="color:var(--red)">'+fmt(st.out)+'</div>';
     h+='<div class="stat-col" style="color:var(--grn)">'+fmt(st.inp)+'</div>';
-    h+='<div class="stat-col" style="color:'+dc2+'font-weight:800">'+(nd>=0?'+':'')+fmt(nd)+'</div></div>'}
+    h+='<div class="stat-col" style="color:'+dc2+';font-weight:800">'+(nd>=0?'+':'')+fmt(nd)+'</div></div>';
+    h+='<div style="height:4px;border-radius:3px;background:var(--sf2);margin:-2px 10px 6px 52px"><div style="height:4px;border-radius:3px;background:'+(nd>=0?'var(--grn)':'var(--red)')+';width:'+Math.min(100,Math.abs(nd)/Math.max(1,Math.abs(S.players[sorted[0]].balance-S.players[sorted[0]].initial))*100)+'%"></div></div>'}
   h+='</div>';
+  h+='<div id="uhc2" style="'+(uhTab!=='res'?'display:none':'')+'">';
+  var debts=calcDebts();
+  h+='<div class="slbl">Thanh toan cuoi tran</div>';
+  if(debts.length===0)h+='<div class="hi">Khong co khoan no can thanh toan</div>';
+  else{for(var di2=0;di2<debts.length;di2++){var dtx=debts[di2];h+='<div class="hi">'+esc(S.players[dtx.from].name)+' tra '+esc(S.players[dtx.to].name)+' '+ff(dtx.amount)+'</div>'}}
+  h+='<button class="btn-ghost" onclick="copyResult()">Copy de chia se</button></div>';
   h+='</div></div>';
   $('modal-root').innerHTML=h;S.modal='__uh__'}
 function doUndoH(){doUndo();if($('modal-root').innerHTML)renderUhModal()}
@@ -485,7 +600,7 @@ function resetHard(){
   if(!confirm('XOA TOAN BO? Khong the hoan tac!'))return;
   S.sessions=[];S.phase='setup';S.hist=[];S.undoStack=[];S.round=1;
   S.players=mkPlayers(5);$('undo-root').innerHTML='';clMoF();
-  try{localStorage.removeItem('wc_v12')}catch(e){}render()}
+  try{localStorage.removeItem('wc_v13');localStorage.removeItem('wc_v12')}catch(e){}render()}
 
 /* ===== SESSIONS MODAL ===== */
 function showSess(){
@@ -500,9 +615,26 @@ function showSess(){
     h+='<button onclick="clrSess()" class="btn-ghost dng">Xoa tat ca lich su</button>'}
   h+='</div></div>';$('modal-root').innerHTML=h;S.modal='__ss__'}
 function clrSess(){if(!confirm('Xoa tat ca lich su?'))return;S.sessions=[];saveState();showSess()}
+function showSettings(){
+  var h='<div class="mo" onclick="clMo(event)"><div class="md" onclick="event.stopPropagation()">';
+  h+='<div class="mh"><h2>⚙ Cai dat</h2><button class="mc" onclick="clMoF()">×</button></div>';
+  h+='<div class="slbl">HIEN THI</div>';
+  h+='<label style="display:flex;gap:8px;margin-bottom:6px"><input type="checkbox" '+(S.compact?'checked':'')+' onchange="S.compact=this.checked"> Che do compact cards</label>';
+  h+='<label style="display:flex;gap:8px;margin-bottom:6px"><input type="checkbox" '+(S.showTimerAlways?'checked':'')+' onchange="S.showTimerAlways=this.checked"> Luon hien thi dong ho</label>';
+  h+='<label style="display:flex;gap:8px;margin-bottom:10px"><input type="checkbox" '+(S.showRanks?'checked':'')+' onchange="S.showRanks=this.checked"> Hien thi thu hang tren card</label>';
+  h+='<div class="slbl">AM THANH & RUNG</div>';
+  h+='<label style="display:flex;gap:8px;margin-bottom:6px"><input type="checkbox" '+(S.soundEnabled?'checked':'')+' onchange="S.soundEnabled=this.checked"> Am thanh giao dich</label>';
+  h+='<label style="display:flex;gap:8px;margin-bottom:10px"><input type="checkbox" '+(S.vibrateEnabled?'checked':'')+' onchange="S.vibrateEnabled=this.checked"> Rung khi thuc hien</label>';
+  h+='<div class="slbl">QUY CHUNG</div>';
+  h+='<label style="display:flex;gap:8px;margin-bottom:6px"><input type="checkbox" '+(S.potEnabled?'checked':'')+' onchange="togglePot(this.checked)"> Bat quy chung</label>';
+  h+='<div class="ca"><input type="number" value="'+(S.pot/1000)+'" oninput="upPot(this.value)" min="0" step="0.5"><span>x 1.000d</span></div>';
+  h+='<button class="sbt" onclick="saveState();clMoF();render()">Luu</button></div></div>';
+  $('modal-root').innerHTML=h;S.modal='__set__'
+}
 
 /* ===== OPEN / CLOSE MODALS ===== */
 function openAct(i){S.ap=i;S.atab='send';S.aamt=0;S.atgt=[];S.modal='action';$('modal-root').innerHTML=rActModal()}
+function openPotAct(){if(!S.potEnabled)return;openAct(-1)}
 function openActQ(e,i,tab){e.stopPropagation();S.ap=i;S.atab=tab;S.aamt=0;var others=[];for(var j=0;j<S.players.length;j++){if(j!==i)others.push(j)}S.atgt=[];for(var j=0;j<others.length;j++)S.atgt.push(others[j]);S.modal='action';$('modal-root').innerHTML=rActModal();updTgt()}
 function clMo(e){if(e.target.classList.contains('mo'))clMoF()}
 function clMoF(){S.modal=null;$('modal-root').innerHTML=''}
@@ -515,16 +647,29 @@ function copyResult(){
   var sorted=[];for(var i=0;i<S.players.length;i++)sorted.push(i);
   sorted.sort(function(a,b){return S.players[b].balance-S.players[a].balance});
   for(var i=0;i<sorted.length;i++){var p=S.players[sorted[i]];var d=p.balance-p.initial;lines.push((i+1)+'. '+p.name+': '+ff(p.balance)+' ('+(d>=0?'+':'')+fmt(d)+')')}
-  lines.push('');lines.push('Tong: '+ff(totBal())+' | '+S.hist.length+' GD | Vong '+S.round);
+  if(uhTab==='res'){var debts=calcDebts();lines.push('');lines.push('Thanh toan cuoi tran:');for(var di=0;di<debts.length;di++)lines.push('- '+S.players[debts[di].from].name+' tra '+S.players[debts[di].to].name+' '+ff(debts[di].amount))}
+  lines.push('');lines.push('Tong: '+ff(totBal()+S.pot)+' | '+S.hist.length+' GD | Vong '+S.round);
   var txt=lines.join('\n');
   function fb(){var ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');alert('Da copy!')}catch(xe){alert(txt)}document.body.removeChild(ta)}
   try{if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(txt).then(function(){alert('Da copy!')}).catch(fb);else fb()}catch(xe){fb()}}
 
 /* ===== SETUP HELPERS ===== */
-function setPC(n){while(S.players.length<n)S.players.push({name:'Player '+(S.players.length+1),color:COLS[S.players.length%COLS.length],emoji:'',balance:DBAL,initial:DBAL});while(S.players.length>n)S.players.pop();render()}
+function setPC(n){while(S.players.length<n)S.players.push({name:'Nguoi choi '+(S.players.length+1),color:COLS[S.players.length%COLS.length],emoji:'',balance:DBAL,initial:DBAL});while(S.players.length>n)S.players.pop();render()}
 function upName(i,v){S.players[i].name=v||('P'+(i+1))}
 function upBal(i,v){var n=parseFloat(v)*1000;if(isNaN(n)||n<=0)n=1000;n=Math.round(n/500)*500;S.players[i].initial=n;S.players[i].balance=n;var t=$('totLbl');if(t)t.textContent=ff(totInit())}
 function upQD(qi,v){var n=parseFloat(v)*1000;if(!isNaN(n)&&n>0)S.quickDenoms[qi]=Math.round(n/500)*500}
+function togglePot(v){S.potEnabled=v;if(!v)S.pot=0;render()}
+function upPot(v){var n=parseFloat(v)*1000;if(isNaN(n)||n<0)n=0;S.pot=Math.round(n/500)*500}
+function resetDefaults(){for(var i=0;i<S.players.length;i++){S.players[i].name='Nguoi choi '+(i+1);S.players[i].color=COLS[i%COLS.length];S.players[i].emoji=''}render()}
+function splitTotal(){var v=prompt('Nhap tong tien can chia deu (nghin dong):','500');if(v===null)return;var t=Math.round(parseFloat(v)*1000);if(isNaN(t)||t<=0)return;var each=Math.floor(t/S.players.length/500)*500;if(each<500)each=500;for(var i=0;i<S.players.length;i++){S.players[i].initial=each;S.players[i].balance=each}render()}
+function toggleCompact(){S.compact=!S.compact;render()}
+function setHistFilter(i){S.histFilter=i;render()}
+function setHistFilterFromSel(v){S.histFilter=parseInt(v,10);renderUhModal()}
+function setUhTab(t){uhTab=t;renderUhModal()}
+var pcPressTimer=null,pcPressInterval=null;
+function adjustPC(dir){var n=S.players.length+dir;if(n<2||n>20)return;setPC(n)}
+function pcPressStart(dir){adjustPC(dir);pcPressTimer=setTimeout(function(){pcPressInterval=setInterval(function(){adjustPC(dir)},100)},500)}
+function pcPressEnd(){clearTimeout(pcPressTimer);clearInterval(pcPressInterval)}
 
 /* AVATAR PICKER */
 var pkFor=-1;
@@ -549,10 +694,10 @@ function startG(){
   var seen={};
   for(var i=0;i<S.players.length;i++){
     var n=S.players[i].name.trim();
-    if(!n){alert('Player '+(i+1)+' chua co ten!');return}
+    if(!n){alert('Nguoi choi '+(i+1)+' chua co ten!');return}
     if(seen[n]){alert('Ten bi trung: '+n);return}
     seen[n]=1;S.players[i].name=n}
-  S.phase='playing';S.hist=[];S.undoStack=[];S.round=1;render()}
+  S.phase='playing';S.hist=[];S.undoStack=[];S.round=1;S.hidePinned=false;if(S.autoTimerStart){resetTimer();startTimer()}else resetTimer();startTimerTick();render()}
 
 render();
 </script>
