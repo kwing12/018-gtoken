@@ -4,6 +4,10 @@ var DENOMS=[1000,2000,5000,10000,20000,50000];
 var DBAL=100000;
 var timerInterval=null;
 var toastTimer=null;
+var BP_SM=640;
+var layoutSm=false;
+var layoutTouch=false;
+var layoutRenderTimer=null;
 
 function mkPlayers(n){var a=[];for(var i=0;i<n;i++)a.push({name:'Người chơi '+(i+1),color:COLS[i%COLS.length],emoji:'',balance:DBAL,initial:DBAL});return a}
 function normState(sv){
@@ -42,6 +46,37 @@ if(!S){
 if(!S)S={phase:'setup',players:mkPlayers(5),hist:[],sessions:[],quickDenoms:[1000,2000,5000,10000],modal:null,ap:null,atab:'send',aamt:0,atgt:[],undoStack:[],undoTimer:null,round:1,sortDesc:false,pot:0,potEnabled:false,timer:{startMs:0,elapsed:0,running:false},pinnedNote:'',theme:'auto',compact:false,autoTimerStart:true,showRanks:false,showTimerAlways:false,soundEnabled:true,vibrateEnabled:true,txTemplates:[],histFilter:-1,hidePinned:false};
 applyTheme();
 try{window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){if(S.theme==='auto')applyTheme()})}catch(e){try{window.matchMedia('(prefers-color-scheme: dark)').addListener(function(){if(S.theme==='auto')applyTheme()})}catch(e2){}}
+function syncLayoutFlags(){
+  var prevSm=layoutSm;
+  try{layoutSm=window.matchMedia('(max-width: 639px)').matches}catch(e){layoutSm=(window.innerWidth<BP_SM)}
+  try{layoutTouch=window.matchMedia('(pointer: coarse)').matches}catch(e){layoutTouch=false}
+  var rm=false;
+  try{rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){rm=false}
+  if(rm)document.documentElement.classList.add('reduce-motion');
+  else document.documentElement.classList.remove('reduce-motion');
+  if(layoutTouch)document.documentElement.classList.add('touch');
+  else document.documentElement.classList.remove('touch');
+  return prevSm!==layoutSm;
+}
+function debouncedLayoutRender(){
+  if(layoutRenderTimer)clearTimeout(layoutRenderTimer);
+  layoutRenderTimer=setTimeout(function(){
+    layoutRenderTimer=null;
+    if(S&&S.phase==='playing')render();
+  },120);
+}
+function bindLayoutMedia(){
+  var onVP=function(){if(syncLayoutFlags())debouncedLayoutRender();};
+  var onOther=function(){syncLayoutFlags();};
+  var mqVP=window.matchMedia('(max-width: 639px)');
+  try{mqVP.addEventListener('change',onVP)}catch(e){try{mqVP.addListener(onVP)}catch(e2){}}
+  var mqPT=window.matchMedia('(pointer: coarse)');
+  try{mqPT.addEventListener('change',onOther)}catch(e){try{mqPT.addListener(onOther)}catch(e2){}}
+  var mqRM=window.matchMedia('(prefers-reduced-motion: reduce)');
+  try{mqRM.addEventListener('change',onOther)}catch(e){try{mqRM.addListener(onOther)}catch(e2){}}
+}
+syncLayoutFlags();
+bindLayoutMedia();
 
 /* ===== UTILS ===== */
 function fmt(n){var a=n<0?-n:n;if(a>=1000000)return(n/1000000).toFixed(a%1000000===0?0:1)+'M';if(a>=1000)return(n/1000).toFixed(a%1000===0?0:1)+'k';return''+n}
@@ -86,7 +121,7 @@ function saveState(){
 }
 
 /* ===== RENDER ===== */
-function render(){var a=$('app');if(S.phase==='setup')a.innerHTML=rSetup();else a.innerHTML=rPlay();saveState()}
+function render(){var a=$('app');if(!a)return;if(S.phase==='setup')a.innerHTML=rSetup();else a.innerHTML=rPlay();saveState()}
 
 /* ===== THEME TOGGLE ===== */
 function toggleTheme(){if(S.theme==='auto')S.theme='dark';else if(S.theme==='dark')S.theme='light';else S.theme='auto';applyTheme();saveState();render()}
@@ -135,10 +170,9 @@ function rSetup(){
 function rPlay(){
   var tot=totBal()+S.pot,ti=totInit()+S.pot,ok=(tot===ti),undoCnt=S.undoStack.length,mode=cardMode();
   var showTimer=(S.showTimerAlways||S.timer.running||getElapsed()>0);
-  var isMobile=(window.innerWidth<640);
   var h='<div class="hd"><div class="hd-l"><h1>VÍ TRUNG TÂM</h1>';
   h+='<div class="rnd" onclick="incRound()">Vòng <b>'+S.round+'</b></div></div>';
-  if(showTimer&&isMobile)h+='<button id="timerElBtn" class="timer-btn '+(S.timer.running?'run':'pause')+'" onclick="toggleTimer()">'+(S.timer.running?'⏸ ':'▶ ')+'<span id="timerEl">'+fmtTime(getElapsed())+'</span></button>';
+  if(showTimer&&layoutSm)h+='<button id="timerElBtn" class="timer-btn '+(S.timer.running?'run':'pause')+'" onclick="toggleTimer()">'+(S.timer.running?'⏸ ':'▶ ')+'<span id="timerEl">'+fmtTime(getElapsed())+'</span></button>';
   h+='<div class="hd-r">';
   h+='<button class="ib'+(undoCnt>0?' hot':'')+'" onclick="showUndoHist()" title="Hoàn tác">↺'+(undoCnt>0?' '+undoCnt:'')+'</button>';
   h+='<button class="ib'+(S.sortDesc?' hot':'')+'" onclick="toggleSort()" title="Sắp xếp">⇅</button>';
@@ -150,7 +184,7 @@ function rPlay(){
   if(S.pinnedNote&&!S.hidePinned)h+='<div class="note"><span>'+esc(S.pinnedNote)+'</span><button class="mc" style="width:22px;height:22px" onclick="S.hidePinned=true;render()">×</button></div>';
   h+='<div class="ckb"><span>'+S.hist.length+' GD &bull; Tổng: <b style="color:var(--tx)">'+ff(tot)+'</b></span>';
   h+='<span class="'+(ok?'ok':'er')+'">'+(ok?'&#10003; Hợp lệ':'&#10007; LỆCH')+'</span></div>';
-  if(showTimer&&!isMobile){h+='<div style="padding:7px 13px;border-bottom:1px solid var(--bd);display:flex;justify-content:flex-end"><button id="timerElBtn" class="timer-btn '+(S.timer.running?'run':'pause')+'" onclick="toggleTimer()">'+(S.timer.running?'⏸ ':'▶ ')+'<span id="timerEl">'+fmtTime(getElapsed())+'</span></button></div>'}
+  if(showTimer&&!layoutSm){h+='<div style="padding:7px 13px;border-bottom:1px solid var(--bd);display:flex;justify-content:flex-end"><button id="timerElBtn" class="timer-btn '+(S.timer.running?'run':'pause')+'" onclick="toggleTimer()">'+(S.timer.running?'⏸ ':'▶ ')+'<span id="timerEl">'+fmtTime(getElapsed())+'</span></button></div>'}
   h+='<div class="pls">';
   if(S.potEnabled){h+='<div class="pc compact" onclick="openPotAct()"><div class="stripe" style="background:var(--gld)"></div><div class="pc-body"><div class="av" style="background:var(--gld)">💰</div><div class="inf"><div class="nm">Quỹ chung</div><div class="bal">'+ff(S.pot)+'</div></div></div><div class="pc-r"><div class="dl dz">Quỹ</div></div></div>'}
   var idxs=[];for(var k=0;k<S.players.length;k++)idxs.push(k);
@@ -187,7 +221,7 @@ function rActModal(){
   var d0=getModalDelta();
   var h='<div class="mo" onclick="clMo(event)"><div class="md" onclick="event.stopPropagation()">';
   h+='<div class="mh"><h2>'+avHtml(p,'av2',16)+' '+esc(p.name)+'</h2><button class="mc" onclick="clMoF()">&#10005;</button></div>';
-  h+='<div style="text-align:center;margin-bottom:12px;font-family:monospace;font-size:28px;font-weight:800"><span id="modalBal">'+ff(p.balance+d0)+'</span><span id="modalDelta" style="font-size:14px;color:var(--dim)">'+(d0===0?'':' ('+(d0>0?'+':'')+ff(d0)+')')+'</span></div>';
+  h+='<div class="modal-bal" style="text-align:center;margin-bottom:12px;font-family:monospace;font-weight:800"><span id="modalBal">'+ff(p.balance+d0)+'</span><span id="modalDelta" class="modal-delta">'+(d0===0?'':' ('+(d0>0?'+':'')+ff(d0)+')')+'</span></div>';
   h+='<div class="mtabs"><button id="t0" class="mtab'+(is?' on':'')+'" onclick="setTab(\'send\')">&#8594; GỬI</button><button id="t1" class="mtab'+(!is?' on':'')+'" onclick="setTab(\'receive\')">&#8592; NHẬN</button></div>';
   if(S.txTemplates.length>0){h+='<div class="slbl">MẪU GIAO DỊCH</div><div style="display:flex;gap:5px;overflow:auto;margin-bottom:8px">';for(var ti=0;ti<S.txTemplates.length;ti++){h+='<button class="btn-ghost" style="margin:0;padding:6px 8px;white-space:nowrap" onclick="applyTpl('+ti+')">★ '+esc(S.txTemplates[ti].name)+'</button>'}h+='</div>'}
   h+='<div class="slbl">NHANH &mdash; CHỌN LUÔN TẤT CẢ</div>';
