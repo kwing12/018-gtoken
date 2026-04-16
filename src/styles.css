@@ -49,7 +49,7 @@ html.dark .pc.bust{box-shadow:0 0 14px rgba(248,113,113,.15)}
 .dz{background:rgba(136,153,180,.12);color:var(--dim)}
 html.dark .dp{background:rgba(34,211,174,.13)}html.dark .dn{background:rgba(248,113,113,.13)}
 .qa-r{display:flex;gap:4px}
-.qa{width:26px;height:26px;border-radius:7px;background:var(--sf2);border:1px solid var(--bd);font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.qa{height:26px;border-radius:7px;background:var(--sf2);border:1px solid var(--bd);font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0 7px;font-weight:700;white-space:nowrap}
 .qa:active{transform:scale(.78)}
 .qa.qs{color:var(--red);border-color:rgba(220,38,38,.25)}
 .qa.qr{color:var(--grn);border-color:rgba(13,148,118,.25)}
@@ -97,11 +97,14 @@ html.dark .albt.sel{background:rgba(245,200,66,.08)}
 .tr{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;background:var(--bg);cursor:pointer;border:1.5px solid transparent;transition:all .1s}
 .tr:active{transform:scale(.98)}
 .tr.sel{border-color:var(--gld);background:rgba(201,134,12,.04)}
+.tr.mod{box-shadow:inset 0 0 0 1px rgba(201,134,12,.5)}
 html.dark .tr.sel{background:rgba(245,200,66,.04)}
 .av2{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0}
 .av2.em{font-size:16px;background:transparent!important}
-.tn{flex:1;font-size:13px;font-weight:500}
-.tb{font-size:11px;color:var(--dim);font-family:monospace}
+.tn{flex:1;font-size:12px;font-weight:600;min-width:0}
+.tb{font-size:11px;color:var(--dim);font-family:monospace;min-width:78px;text-align:right}
+.trpm{width:24px;height:22px;border-radius:6px;background:var(--sf2);border:1px solid var(--bd);color:var(--tx);font-size:13px;font-weight:800;cursor:pointer;line-height:1}
+.trpm:active{transform:scale(.92)}
 .ck2{font-size:14px;color:var(--gld);opacity:0;transition:opacity .1s}
 .tr.sel .ck2{opacity:1}
 /* ERROR MSG */
@@ -210,6 +213,12 @@ html.dark .ub button{color:#000}
 .btn-ghost{width:100%;padding:9px;border-radius:9px;background:transparent;border:1px solid var(--bd);color:var(--dim);font-size:12px;cursor:pointer;margin-top:4px}
 .btn-ghost:active{transform:scale(.98)}
 .btn-ghost.dng{border-color:rgba(220,38,38,.4);color:var(--red)}
+.btn-setup{width:100%;padding:9px 12px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;margin-top:6px;transition:transform .1s,opacity .1s}
+.btn-setup:active{transform:scale(.98)}
+.btn-setup-secondary{background:var(--sf2);border:1px solid var(--bd);color:var(--tx)}
+.btn-setup-primary{background:var(--gld);border:1px solid transparent;color:#fff}
+.btn-setup-inline{margin:0;flex-shrink:0;width:auto;padding:8px 12px}
+html.dark .btn-setup-primary{color:#000}
 .made-by{
   position:fixed;
   right:10px;
