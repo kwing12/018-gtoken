@@ -137,9 +137,9 @@ function rSetup(){
   h+='<div style="flex:1">';
   h+='<div class="slbl" style="margin-bottom:6px">Nhập danh sách tên (phân cách bằng dấu phẩy)</div>';
   h+='<textarea id="bulkNamesInp" class="bulk-names" oninput="syncNameListDraft(this.value)" onblur="saveState()" placeholder="Ví dụ: Player 1, Player 2, Player 3">'+esc(S.nameListDraft||'')+'</textarea>';
-  h+='<div class="bulk-actions"><button type="button" class="btn-setup btn-setup-primary btn-setup-inline" onclick="applyNameListFromBulk()">Xác nhận danh sách</button>';
-  h+='<button type="button" class="btn-setup btn-setup-secondary btn-setup-inline" onclick="clearBulkNameInput()">Xóa ô nhập</button></div>';
-  h+='<div style="font-size:10px;color:var(--dim);margin-bottom:12px;line-height:1.4">Có thể thêm khoảng trắng sau dấu phẩy hoặc không. Sau khi xác nhận, danh sách người chơi bên dưới sẽ khớp số tên (2–20).</div>';
+  h+='<div class="bulk-actions"><button type="button" class="btn-setup btn-setup-primary btn-setup-inline" onclick="applyNameListFromBulk()">Nhập mới toàn bộ</button>';
+  h+='<button type="button" class="btn-setup btn-setup-secondary btn-setup-inline" onclick="appendNameListFromBulk()">Nhập thêm</button></div>';
+  h+='<div style="font-size:10px;color:var(--dim);margin-bottom:12px;line-height:1.4">Phân cách tên bằng dấu phẩy (khoảng trắng tùy ý). <b>Nhập mới toàn bộ</b> thay toàn bộ người chơi (2–20 tên). <b>Nhập thêm</b> nối thêm vào danh sách hiện có (tối đa 20 người). Sau khi áp dụng, ô nhập được xóa.</div>';
   h+='<div class="slbl" style="margin-bottom:8px">Số người chơi (2-20)</div>';
   h+='<div class="pc-ctl"><button class="pc-step" onmousedown="pcPressStart(-1)" onmouseup="pcPressEnd()" onmouseleave="pcPressEnd()" ontouchstart="pcPressStart(-1)" ontouchend="pcPressEnd()">-</button><div class="pc-num">'+S.players.length+'</div><button class="pc-step" onmousedown="pcPressStart(1)" onmouseup="pcPressEnd()" onmouseleave="pcPressEnd()" ontouchstart="pcPressStart(1)" ontouchend="pcPressEnd()">+</button></div>';
   h+='<button class="btn-setup btn-setup-secondary" onclick="resetDefaults()">Đặt tất cả về mặc định</button>';
@@ -605,7 +605,30 @@ function applyNameListFromBulk(){
   pkFor=-1;
   saveState();render()
 }
-function clearBulkNameInput(){S.nameListDraft='';var el=$('bulkNamesInp');if(el)el.value='';saveState();render()}
+function appendNameListFromBulk(){
+  var el=$('bulkNamesInp');
+  var raw=el?el.value:(S.nameListDraft||'');
+  var names=parseCommaNames(raw);
+  if(names.length<1){alert('Nhập ít nhất một tên để thêm.');return}
+  if(S.players.length+names.length>20){alert('Tối đa 20 người chơi (hiện '+S.players.length+', đang thêm '+names.length+').');return}
+  var seenBatch={};
+  for(var a=0;a<names.length;a++){
+    if(seenBatch[names[a]]){alert('Tên bị trùng trong ô nhập: '+names[a]);return}
+    seenBatch[names[a]]=1
+  }
+  var existing={};
+  for(var i=0;i<S.players.length;i++)existing[S.players[i].name.trim()]=1;
+  for(var j=0;j<names.length;j++){
+    var nm=names[j];
+    if(existing[nm]){alert('Tên đã có trong danh sách: '+nm);return}
+    existing[nm]=1
+  }
+  var start=S.players.length;
+  for(var k=0;k<names.length;k++)S.players.push({name:names[k],color:COLS[(start+k)%COLS.length],emoji:'',balance:DBAL,initial:DBAL});
+  S.nameListDraft='';
+  pkFor=-1;
+  saveState();render()
+}
 function removePlayerAt(i){
   if(S.players.length<=2){alert('Cần ít nhất 2 người chơi.');return}
   if(i<0||i>=S.players.length)return;
