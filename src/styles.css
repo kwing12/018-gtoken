@@ -122,10 +122,15 @@ html.dark .exb.r{color:#000}
 /* SETUP */
 .srow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd)}
 .srow:last-child{border-bottom:none}
+.srow-x{width:32px;height:32px;border-radius:9px;background:var(--sf2);border:1px solid var(--bd);color:var(--dim);font-size:20px;line-height:1;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0}
+.srow-x:active{transform:scale(.9)}
+.bulk-names{width:100%;min-height:76px;padding:10px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--bd);color:var(--tx);font-size:13px;line-height:1.45;resize:vertical;font-family:inherit;box-sizing:border-box}
+.bulk-names:focus{outline:none;border-color:var(--gld)}
+.bulk-actions{display:flex;gap:8px;margin-top:8px;margin-bottom:0;flex-wrap:wrap;align-items:center}
 .sav{width:34px;height:34px;border-radius:10px;cursor:pointer;flex-shrink:0;border:2px solid var(--bd);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:#fff;transition:transform .1s}
 .sav:active{transform:scale(.82)}
 .sav.em{font-size:22px;border-color:var(--bd)}
-.snm{flex:1;padding:7px 9px;border-radius:8px;background:var(--bg);border:1px solid var(--bd);color:var(--tx);font-size:13px;outline:none}
+.snm{flex:1;min-width:0;padding:7px 9px;border-radius:8px;background:var(--bg);border:1px solid var(--bd);color:var(--tx);font-size:13px;outline:none}
 .snm:focus{border-color:var(--gld)}
 .sbal{width:60px;padding:7px 5px;border-radius:8px;background:var(--bg);border:1px solid var(--bd);color:var(--tx);font-size:13px;text-align:right;outline:none;font-family:monospace}
 .sbal:focus{border-color:var(--gld)}

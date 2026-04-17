@@ -32,6 +32,7 @@ function normState(sv){
   if(!s.txTemplates)s.txTemplates=[];
   if(!s.histFilter)s.histFilter=-1;
   if(typeof s.hidePinned==='undefined')s.hidePinned=false;
+  if(typeof s.nameListDraft!=='string')s.nameListDraft='';
   for(var i=0;i<s.players.length;i++){
     if(typeof s.players[i].emoji==='undefined')s.players[i].emoji='';
     if(!s.players[i].name)s.players[i].name='Người chơi '+(i+1);
@@ -43,7 +44,7 @@ try{S=normState(JSON.parse(localStorage.getItem('wc_v13')||'null'))}catch(e){}
 if(!S){
   try{S=normState(JSON.parse(localStorage.getItem('wc_v12')||'null'))}catch(e){}
 }
-if(!S)S={phase:'setup',players:mkPlayers(5),hist:[],sessions:[],quickDenoms:[1000,2000,5000,10000],modal:null,ap:null,atab:'send',aamt:0,atgt:[],undoStack:[],undoTimer:null,round:1,sortDesc:false,pot:0,potEnabled:false,timer:{startMs:0,elapsed:0,running:false},pinnedNote:'',theme:'auto',compact:false,autoTimerStart:true,showRanks:false,showTimerAlways:false,soundEnabled:true,vibrateEnabled:true,txTemplates:[],histFilter:-1,hidePinned:false};
+if(!S)S={phase:'setup',players:mkPlayers(5),hist:[],sessions:[],quickDenoms:[1000,2000,5000,10000],modal:null,ap:null,atab:'send',aamt:0,atgt:[],undoStack:[],undoTimer:null,round:1,sortDesc:false,pot:0,potEnabled:false,timer:{startMs:0,elapsed:0,running:false},pinnedNote:'',theme:'auto',compact:false,autoTimerStart:true,showRanks:false,showTimerAlways:false,soundEnabled:true,vibrateEnabled:true,txTemplates:[],histFilter:-1,hidePinned:false,nameListDraft:''};
 applyTheme();
 try{window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){if(S.theme==='auto')applyTheme()})}catch(e){try{window.matchMedia('(prefers-color-scheme: dark)').addListener(function(){if(S.theme==='auto')applyTheme()})}catch(e2){}}
 function syncLayoutFlags(){
@@ -115,7 +116,7 @@ function applyTheme(){var dark=false;if(S.theme==='dark')dark=true;else if(S.the
 function saveState(){
   try{
     var savedTimer={startMs:S.timer.startMs,elapsed:S.timer.elapsed,running:S.timer.running};
-    var o={phase:S.phase,players:S.players,hist:S.hist,sessions:S.sessions,quickDenoms:S.quickDenoms,undoStack:S.undoStack,round:S.round,sortDesc:S.sortDesc,pot:S.pot,potEnabled:S.potEnabled,timer:savedTimer,pinnedNote:S.pinnedNote,theme:S.theme,compact:S.compact,autoTimerStart:S.autoTimerStart,showRanks:S.showRanks,showTimerAlways:S.showTimerAlways,soundEnabled:S.soundEnabled,vibrateEnabled:S.vibrateEnabled,txTemplates:S.txTemplates,histFilter:S.histFilter,hidePinned:S.hidePinned};
+    var o={phase:S.phase,players:S.players,hist:S.hist,sessions:S.sessions,quickDenoms:S.quickDenoms,undoStack:S.undoStack,round:S.round,sortDesc:S.sortDesc,pot:S.pot,potEnabled:S.potEnabled,timer:savedTimer,pinnedNote:S.pinnedNote,theme:S.theme,compact:S.compact,autoTimerStart:S.autoTimerStart,showRanks:S.showRanks,showTimerAlways:S.showTimerAlways,soundEnabled:S.soundEnabled,vibrateEnabled:S.vibrateEnabled,txTemplates:S.txTemplates,histFilter:S.histFilter,hidePinned:S.hidePinned,nameListDraft:S.nameListDraft};
     localStorage.setItem('wc_v13',JSON.stringify(o))
   }catch(e){}
 }
@@ -134,6 +135,11 @@ function rSetup(){
   h+='<div style="font-size:10px;color:var(--dim);margin-top:3px;letter-spacing:2px">v1.3 &mdash; GHI SỔ GIAO DỊCH</div></div>';
   h+='<button onclick="toggleTheme()" class="ib" style="width:36px;height:36px">'+(S.theme==='dark'?'☀':'◐')+'</button></div>';
   h+='<div style="flex:1">';
+  h+='<div class="slbl" style="margin-bottom:6px">Nhập danh sách tên (phân cách bằng dấu phẩy)</div>';
+  h+='<textarea id="bulkNamesInp" class="bulk-names" oninput="syncNameListDraft(this.value)" onblur="saveState()" placeholder="Ví dụ: Player 1, Player 2, Player 3">'+esc(S.nameListDraft||'')+'</textarea>';
+  h+='<div class="bulk-actions"><button type="button" class="btn-setup btn-setup-primary btn-setup-inline" onclick="applyNameListFromBulk()">Xác nhận danh sách</button>';
+  h+='<button type="button" class="btn-setup btn-setup-secondary btn-setup-inline" onclick="clearBulkNameInput()">Xóa ô nhập</button></div>';
+  h+='<div style="font-size:10px;color:var(--dim);margin-bottom:12px;line-height:1.4">Có thể thêm khoảng trắng sau dấu phẩy hoặc không. Sau khi xác nhận, danh sách người chơi bên dưới sẽ khớp số tên (2–20).</div>';
   h+='<div class="slbl" style="margin-bottom:8px">Số người chơi (2-20)</div>';
   h+='<div class="pc-ctl"><button class="pc-step" onmousedown="pcPressStart(-1)" onmouseup="pcPressEnd()" onmouseleave="pcPressEnd()" ontouchstart="pcPressStart(-1)" ontouchend="pcPressEnd()">-</button><div class="pc-num">'+S.players.length+'</div><button class="pc-step" onmousedown="pcPressStart(1)" onmouseup="pcPressEnd()" onmouseleave="pcPressEnd()" ontouchstart="pcPressStart(1)" ontouchend="pcPressEnd()">+</button></div>';
   h+='<button class="btn-setup btn-setup-secondary" onclick="resetDefaults()">Đặt tất cả về mặc định</button>';
@@ -145,7 +151,8 @@ function rSetup(){
     var avClass='sav'+(p.emoji?' em':'');
     h+='<div class="srow" style="'+(S.players.length>8?'height:44px;':'')+'"><div class="'+avClass+'" style="'+(p.emoji?'':'background:'+p.color)+'" onclick="pickAv('+i+')">'+avContent+'</div>';
     h+='<input class="snm" value="'+esc(p.name)+'" oninput="upName('+i+',this.value)" placeholder="Tên người chơi">';
-    h+='<input class="sbal" value="'+(p.initial/1000)+'" oninput="upBal('+i+',this.value)" type="number" step="0.5" min="0.5"><span class="sdim">k</span></div>'}
+    h+='<input class="sbal" value="'+(p.initial/1000)+'" oninput="upBal('+i+',this.value)" type="number" step="0.5" min="0.5"><span class="sdim">k</span>';
+    h+='<button type="button" class="srow-x" onclick="removePlayerAt('+i+')" title="Xóa người chơi này" aria-label="Xóa">×</button></div>'}
   h+='</div>';
   h+='<div id="pkpnl"></div>';
   h+='<div style="margin-top:14px;border-top:1px solid var(--bd);padding-top:12px">';
@@ -568,6 +575,44 @@ function copyResult(){
   try{if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(txt).then(function(){alert('Đã sao chép!')}).catch(fb);else fb()}catch(xe){fb()}}
 
 /* ===== SETUP HELPERS ===== */
+function parseCommaNames(text){
+  if(!text)return[];
+  var parts=String(text).split(',');
+  var out=[];
+  for(var i=0;i<parts.length;i++){
+    var t=parts[i].replace(/\s+/g,' ').trim();
+    if(t)out.push(t)
+  }
+  return out
+}
+function syncNameListDraft(v){S.nameListDraft=v}
+function applyNameListFromBulk(){
+  var el=$('bulkNamesInp');
+  var raw=el?el.value:(S.nameListDraft||'');
+  var names=parseCommaNames(raw);
+  if(names.length<2){alert('Cần ít nhất 2 tên (phân cách bằng dấu phẩy).');return}
+  if(names.length>20){alert('Tối đa 20 người chơi.');return}
+  var seen={};
+  for(var j=0;j<names.length;j++){
+    var nm=names[j];
+    if(seen[nm]){alert('Tên bị trùng: '+nm);return}
+    seen[nm]=1
+  }
+  var newPlayers=[];
+  for(var k=0;k<names.length;k++)newPlayers.push({name:names[k],color:COLS[k%COLS.length],emoji:'',balance:DBAL,initial:DBAL});
+  S.players=newPlayers;
+  S.nameListDraft='';
+  pkFor=-1;
+  saveState();render()
+}
+function clearBulkNameInput(){S.nameListDraft='';var el=$('bulkNamesInp');if(el)el.value='';saveState();render()}
+function removePlayerAt(i){
+  if(S.players.length<=2){alert('Cần ít nhất 2 người chơi.');return}
+  if(i<0||i>=S.players.length)return;
+  S.players.splice(i,1);
+  pkFor=-1;
+  saveState();render()
+}
 function setPC(n){while(S.players.length<n)S.players.push({name:'Người chơi '+(S.players.length+1),color:COLS[S.players.length%COLS.length],emoji:'',balance:DBAL,initial:DBAL});while(S.players.length>n)S.players.pop();render()}
 function upName(i,v){S.players[i].name=v||('P'+(i+1))}
 function upBal(i,v){var n=parseFloat(v)*1000;if(isNaN(n)||n<=0)n=1000;n=Math.round(n/500)*500;S.players[i].initial=n;S.players[i].balance=n;var t=$('totLbl');if(t)t.textContent=ff(totInit())}
